@@ -4,6 +4,7 @@ import pygame
 
 from ball import Ball
 from paddle import Paddle
+from neuralnet import AIPaddle
 
 
 class PongGame:
@@ -11,9 +12,10 @@ class PongGame:
     window_height = 500
 
     def __init__(self):
-        self.cpu_paddle = Paddle(50, PongGame.window_height / 2)
+        # self.cpu_paddle = Paddle(50, PongGame.window_height / 2)
         self.human_paddle = Paddle(PongGame.window_width - 50, PongGame.window_height / 2)
         self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
+        self.cpu_paddle = AIPaddle(50, PongGame.window_height / 2, self.ball, self)
         self.temp_cpu_move_down = True
 
         self.start_game()
@@ -42,15 +44,8 @@ class PongGame:
                 pygame.K_DOWN] and self.human_paddle.bounds.y + self.human_paddle.bounds.height < PongGame.window_height:
                 self.human_paddle.move_down(delta)
 
-            # super advanced neural net ai algorithm
-            if self.temp_cpu_move_down:
-                self.cpu_paddle.move_down(delta)
-                if self.cpu_paddle.bounds.y + self.cpu_paddle.bounds.height >= PongGame.window_height:
-                    self.temp_cpu_move_down = not self.temp_cpu_move_down
-            else:
-                self.cpu_paddle.move_up(delta)
-                if self.cpu_paddle.bounds.y <= 0:
-                    self.temp_cpu_move_down = not self.temp_cpu_move_down
+            # super super advanced AI
+            self.cpu_paddle.follow_ball(delta)
 
             # collision with human paddle
             if self.ball.bounds.x + self.ball.bounds.width >= self.human_paddle.bounds.x and self.human_paddle.bounds.y <= self.ball.bounds.y <= self.ball.bounds.y <= self.human_paddle.bounds.y + self.human_paddle.bounds.height:

@@ -13,3 +13,6 @@ class Ball:
 
     def move(self, delta):
         self.bounds = self.bounds.move(self.vel_x * delta, self.vel_y * delta)
+
+    def get_position(self):
+        return self.bounds.x, self.bounds.y
