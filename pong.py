@@ -67,6 +67,7 @@ class PongGame:
             # off screen
             if self.ball.bounds.x + self.ball.bounds.width > PongGame.window_width or self.ball.bounds.x <= 0:
                 self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
+                self.cpu_paddle = AIPaddle(50, PongGame.window_height / 2, self.ball, self)
             self.ball.move(delta)
 
             self.draw(display)
