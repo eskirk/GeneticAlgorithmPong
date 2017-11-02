@@ -23,3 +23,10 @@ class AIPaddle:
         elif (self.ball.bounds.y + self.ball.bounds.width) < (self.bounds.y + self.bounds.height):
             if self.bounds.y > 0:
                 self.move_up(delta)
+
+
+# Hyper parameters
+CHOICES = 3  # up, down, stay
+GAMMA = 0.99  # learning rate
+
+
