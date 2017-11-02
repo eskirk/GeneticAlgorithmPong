@@ -1,26 +1,38 @@
 import pygame
 import math
 import random
+from neuron import Neuron
+from synapse import Synapse
 
 
 class NeuralNet:
-    def __init__(self, num_hidden_layers, num_neurons):
+    def __init__(self, num_inputs, num_hidden_layers, num_neurons):
         # Copy constructor parameters
         # Create fits array
         # Generate neurons
         # Set biases to 1
         # Generate synapses
 
-        self.fitness = -1
-        self.inputs = []
+        self.fitness = None
+        self.output = None
+        self.inputs = [num_inputs]
         self.neurons = [num_hidden_layers][num_neurons]
-        self.outputs = None
+        self.synapses = []
 
     def __gt__(self, other):
         return self.fitness > other.fitness
 
     # randomly initialize the synapses
     def init_synapses(self):
+        for input_ndx in range(len(self.inputs)):
+            for hidden_ndx in range(len(self.neurons[0])):
+                pass
+
+    def init_inputs(self):
+        for input_ndx in range(len(self.inputs)):
+            pass
+
+    def init_neurons(self):
         pass
 
     # inputs[0] = ball x position
@@ -48,9 +60,6 @@ class NeuralNet:
 
     def sigmoid(self, x):
         return 1 / (1 + math.exp(-x))
-
-    def rand_double(self, min, max):
-        return min + (max - min) * random.uniform()
 
     def randomize(self):
         pass
