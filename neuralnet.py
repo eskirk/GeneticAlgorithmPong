@@ -1,11 +1,14 @@
 import pygame
 
+class NeuralNet:
+    def __init__(self):
+        self.fitness = -1
 
-class AIPaddle:
-    def __init__(self, x_pos, y_pos, ball, game):
-        self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
-        self.ball = ball
-        self.game = game
+    def __gt__(self, other):
+        return self.fitness > other.fitness
+
+    def randomize(self):
+        pass
 
     def draw(self, display):
         pygame.draw.rect(display, (0, 0, 255), self.bounds)
@@ -24,9 +27,5 @@ class AIPaddle:
             if self.bounds.y > 0:
                 self.move_up(delta)
 
-
-# Hyper parameters
-CHOICES = 3  # up, down, stay
-GAMMA = 0.99  # learning rate
-
-
+    def mutate(self):
+        pass

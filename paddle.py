@@ -14,3 +14,4 @@ class Paddle:
     def move_down(self, delta):
         self.bounds = self.bounds.move(0, 250 * delta)
 
+
