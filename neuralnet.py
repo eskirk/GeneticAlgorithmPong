@@ -4,7 +4,7 @@ import random
 
 
 class NeuralNet:
-    def __init__(self):
+    def __init__(self, num_hidden_layers, num_neurons):
         # Copy constructor parameters
         # Create fits array
         # Generate neurons
@@ -12,6 +12,9 @@ class NeuralNet:
         # Generate synapses
 
         self.fitness = -1
+        self.inputs = []
+        self.neurons = [num_hidden_layers][num_neurons]
+        self.outputs = None
 
     def __gt__(self, other):
         return self.fitness > other.fitness
