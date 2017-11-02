@@ -15,3 +15,6 @@ class Paddle:
         self.bounds = self.bounds.move(0, 250 * delta)
 
 
+
+
+
