@@ -16,6 +16,7 @@ class NeuralNet:
         self.fitness = None
         self.output = None
         self.inputs = [num_inputs]
+        self.layers = num_hidden_layers
         self.neurons = [num_hidden_layers][num_neurons]
         self.synapses = []
 
@@ -39,7 +40,23 @@ class NeuralNet:
     # inputs[1] = ball speed
     # inputs[2] = cpu paddle x position
     def get_outputs(self, inputs):
-        pass
+        self.inputs = inputs
+        # go through each of the synapses and add the values to the next layer of neurons
+        for i in range(self.layers):
+            for synapse in self.synapses[i]:
+                synapse.end_neuron.add_value(synapse.start_neuron.get_value())
+            # once all the values have been added together, apply the sigmoid to the final value of the neuron
+            for neuron in self.neurons[i]:
+                neuron.set_value(self.sigmoid(neuron.get_value()))
+
+        # generate the final value by adding all the final layers values together
+        for synapse in self.synapses[self.layers]:
+            synapse.end_neuron.add_value(synapse.start_neuron.get_value())
+
+        # apply the sigmoid function to the final neuron's value
+        output = self.sigmoid(self.neurons[self.layers][0])
+
+        return output
 
     # set current genome fit, if all genomes have been set,
     # create a new generation
