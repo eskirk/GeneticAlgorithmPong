@@ -44,6 +44,27 @@ class NeuralNetBreeder:
 
         return best  # need to actually do the sex part
 
+    # set current genome fit, if all genomes have been set,
+    # create a new generation
+    def new_genome(self, current_fit):
+        pass
+
+    # create a new generation, if the generation has already been initialized,
+    # crossover to create a new generation
+    def new_generation(self):
+        pass
+
+    # sort the genomes and cross them over with all other genomes
+    def crossover(self):
+        pass
+
+    def randomize(self):
+        pass
+
+    def mutate(self):
+        pass
+
+
 
 
 

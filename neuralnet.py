@@ -56,25 +56,17 @@ class NeuralNet:
                 neuron.set_value(self.sigmoid(neuron.get_value()))
 
         # generate the final value by adding all the final layers values together
-        for synapse in self.synapses[self.num_hidden_layers]:
-            synapse.end_neuron.add_value(synapse.start_neuron.get_value())
+        for synapses in self.synapses[self.num_hidden_layers]:
+            for synapse in synapses:
+                synapse.end_neuron.add_value(synapse.start_neuron.get_value())
 
         # apply the sigmoid function to the final neuron's value
-        self.output.set_value(self.sigmoid(self.hidden_layers[self.num_hidden_layers][0]))
+        self.output.set_value(NeuralNet.sigmoid(self.output.get_value()))
 
         return self.output.get_value()
 
-    def init_output(self):
-        self.output = Neuron()
-
-    # sort the genomes and cross them over with all other genomes
-    def crossover(self):
-        pass
-
-    def set_neuron_values(self):
-        pass
-
-    def sigmoid(self, x):
+    @staticmethod
+    def sigmoid(x):
         return 1 / (1 + math.exp(-x))
 
 
