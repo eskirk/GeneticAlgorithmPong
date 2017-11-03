@@ -31,7 +31,12 @@ class NeuralNet:
             for neuron in self.hidden_layers[0]:
                 self.synapses[0].append(Synapse(input_neuron, neuron))
 
-        # link rest of hidden layers
+        # link hidden layers to each other
+        if len(self.hidden_layers) > 1:
+            for curr_ndx in range(len(self.hidden_layers) - 1):
+                for neuron in self.hidden_layers[curr_ndx]:
+                    for next_neuron in self.hidden_layers[curr_ndx + 1]:
+                        self.synapses[curr_ndx + 1].append(Synapse(neuron, next_neuron))
 
         # link last layer to output
         for neuron in self.hidden_layers[len(self.hidden_layers) - 1]:
