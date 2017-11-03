@@ -1,9 +1,8 @@
 import pygame
 import math
-import random
+import pprint
 from neuron import Neuron
 from synapse import Synapse
-
 
 class NeuralNet:
     def __init__(self, num_inputs, num_hidden_layers, num_neurons):
@@ -14,26 +13,21 @@ class NeuralNet:
         # Generate synapses
 
         self.fitness = None
-        self.output = None
-        self.inputs = [num_inputs]
-        self.neurons = [num_hidden_layers][num_neurons]
-        self.synapses = []
+        self.output = Neuron()
+        self.inputs = [Neuron() for _ in range(num_inputs)]
+        self.neurons = [[Neuron() for _ in range(num_neurons)] for _ in range(num_hidden_layers)]
+        self.synapses = [[] for _ in range(num_hidden_layers + 1)]
 
-    def __gt__(self, other):
-        return self.fitness > other.fitness
+        self.init_synapses()
 
-    # randomly initialize the synapses
     def init_synapses(self):
-        for input_ndx in range(len(self.inputs)):
-            for hidden_ndx in range(len(self.neurons[0])):
-                pass
+        # link inputs and first hidden layer
+        for input_ndx, input_neuron in enumerate(self.inputs):
+            for neuron in self.neurons[0]:
+                self.synapses[input_ndx].append(Synapse(input_neuron, neuron))
 
-    def init_inputs(self):
-        for input_ndx in range(len(self.inputs)):
-            pass
-
-    def init_neurons(self):
-        pass
+    def init_output(self):
+        self.output = Neuron()
 
     # inputs[0] = ball x position
     # inputs[1] = ball speed
@@ -90,3 +84,8 @@ class AIPaddle:
         elif (self.ball.bounds.y + self.ball.bounds.width) < (self.bounds.y + self.bounds.height):
             if self.bounds.y > 0:
                 self.move_up(delta)
+
+
+if __name__ == '__main__':
+    net = NeuralNet(3, 1, 3)
+
