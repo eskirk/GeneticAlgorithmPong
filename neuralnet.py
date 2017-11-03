@@ -42,9 +42,6 @@ class NeuralNet:
         for neuron in self.hidden_layers[len(self.hidden_layers) - 1]:
             self.synapses[len(self.synapses) - 1].append(Synapse(neuron, self.output))
 
-    # inputs[0] = ball x position
-    # inputs[1] = ball speed
-    # inputs[2] = cpu paddle x position
     def get_output(self, inputs):
         # set the value of the input neurons to the input values passed in
         n = 0
@@ -53,20 +50,19 @@ class NeuralNet:
             n += 1
 
         # go through each of the synapses and add the values to the next layer of neurons
+        print(self.hidden_layers[0], ' hidden layers, pre inputs')
         for i in range(self.num_hidden_layers):
             for synapse in self.synapses[i]:
                 synapse.end_neuron.add_value(synapse.weight * synapse.start_neuron.get_value())
-                print(synapse.end_neuron, 'pre sigmoid')
-            print(self.hidden_layers[0], ' hidden layers')
+            print(self.hidden_layers[0], ' hidden layers, post inputs')
             # once all the values have been added together, apply the sigmoid to the final value of the neuron
             for neuron in self.hidden_layers[i]:
-                neuron.set_value(self.sigmoid(neuron.get_value()))
-                print(neuron, 'post sigmoid')
+                neuron.set_value(NeuralNet.sigmoid(neuron.get_value()))
 
         # generate the final value by adding all the final layers values together
         for synapse in self.synapses[self.num_hidden_layers]:
             synapse.end_neuron.add_value(synapse.weight * synapse.start_neuron.get_value())
-            print(synapse.end_neuron, ' end neuron')
+        print(self.output, ' final layer, pre sigmoid')
 
         # apply the sigmoid function to the final neuron's value
         self.output.set_value(NeuralNet.sigmoid(self.output.get_value()))
@@ -102,9 +98,39 @@ class AIPaddle:
                 self.move_up(delta)
 
 
+class NNPaddle:
+    def __init__(self, x_pos, y_pos, ball, game):
+        self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
+        self.ball = ball
+        self.game = game
+        self.net = NeuralNet(4, 1, 3)
+
+    def draw(self, display):
+        pygame.draw.rect(display, (0, 0, 255), self.bounds)
+
+    def move_up(self, delta):
+        self.bounds = self.bounds.move(0, -250 * delta)
+
+    def move_down(self, delta):
+        self.bounds = self.bounds.move(0, 250 * delta)
+
+    def follow_ball(self, delta):
+        y_pos = self.bounds.y + self.bounds.height
+        ball_y = self.ball.bounds.y
+        ball_vel_x = self.ball.vel_x
+        ball_vel_y = self.ball.vel_y
+        inputs = [y_pos, ball_y, ball_vel_x, ball_vel_y]
+
+        output = self.net.get_output(inputs)
+        if output > 0.5:
+            if self.bounds.y + self.bounds.height < self.game.window_height:
+                self.move_down(delta)
+        else:
+            if self.bounds.y > 0:
+                self.move_up(delta)
+
+
 if __name__ == '__main__':
-    net = NeuralNet(3, 1, 3)
-    inps = [.02, .05, 0.1]
     print('Inputs: ', inps)
     print('Output:', net.get_output(inps))
 

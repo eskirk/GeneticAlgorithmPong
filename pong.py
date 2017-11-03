@@ -5,6 +5,7 @@ import pygame
 from ball import Ball
 from paddle import Paddle
 from neuralnet import AIPaddle
+from neuralnet import NNPaddle
 
 
 class PongGame:
@@ -14,7 +15,8 @@ class PongGame:
     def __init__(self):
         self.human_paddle = Paddle(PongGame.window_width - 50, PongGame.window_height / 2)
         self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
-        self.cpu_paddle = AIPaddle(50, PongGame.window_height / 2, self.ball, self)
+        # self.cpu_paddle = AIPaddle(50, PongGame.window_height / 2, self.ball, self)
+        self.cpu_paddle = NNPaddle(50, PongGame.window_height / 2, self.ball, self)
         self.temp_cpu_move_down = True
 
         self.start_game()
@@ -75,7 +77,7 @@ class PongGame:
     def handle_offscreen(self):
         if self.ball.bounds.x + self.ball.bounds.width > PongGame.window_width or self.ball.bounds.x <= 0:
             self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
-            self.cpu_paddle = Paddle(50, PongGame.window_height / 2, self.ball, self)
+            self.cpu_paddle = NNPaddle(50, PongGame.window_height / 2, self.ball, self)
 
 
 def main():

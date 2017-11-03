@@ -14,5 +14,4 @@ class Synapse:
         return str(self.start_neuron) + '----' + '{0:.2}'.format(self.weight) + '--->' + str(self.end_neuron)
 
     def randomize(self):
-        self.weight = random.uniform(0, 1)
-
+        self.weight = random.uniform(-1, 1)
