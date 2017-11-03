@@ -4,6 +4,7 @@ import pprint
 from neuron import Neuron
 from synapse import Synapse
 
+
 class NeuralNet:
     def __init__(self, num_inputs, num_hidden_layers, num_neurons):
         # Copy constructor parameters
@@ -15,35 +16,29 @@ class NeuralNet:
         self.fitness = None
         self.output = Neuron()
         self.inputs = [Neuron() for _ in range(num_inputs)]
-        self.neurons = [[Neuron() for _ in range(num_neurons)] for _ in range(num_hidden_layers)]
+        self.hidden_layers = [[Neuron() for _ in range(num_neurons)] for _ in range(num_hidden_layers)]
         self.synapses = [[] for _ in range(num_hidden_layers + 1)]
-
         self.init_synapses()
+
+        for synapse_layer in self.synapses:
+            for synapse in synapse_layer:
+                print(synapse)
+            print()
 
     def init_synapses(self):
         # link inputs and first hidden layer
         for input_ndx, input_neuron in enumerate(self.inputs):
-            for neuron in self.neurons[0]:
-                self.synapses[input_ndx].append(Synapse(input_neuron, neuron))
+            for neuron in self.hidden_layers[0]:
+                self.synapses[0].append(Synapse(input_neuron, neuron))
+
+        # link rest of hidden layers
+
+        # link last layer to output
+        for neuron in self.hidden_layers[len(self.hidden_layers) - 1]:
+            self.synapses[len(self.synapses) - 1].append(Synapse(neuron, self.output))
 
     def init_output(self):
         self.output = Neuron()
-
-    # inputs[0] = ball x position
-    # inputs[1] = ball speed
-    # inputs[2] = cpu paddle x position
-    def get_outputs(self, inputs):
-        pass
-
-    # set current genome fit, if all genomes have been set,
-    # create a new generation
-    def new_genome(self, current_fit):
-        pass
-
-    # create a new generation, if the generation has already been initialized,
-    # crossover to create a new generation
-    def new_generation(self):
-        pass
 
     # sort the genomes and cross them over with all other genomes
     def crossover(self):
@@ -56,9 +51,6 @@ class NeuralNet:
         return 1 / (1 + math.exp(-x))
 
     def randomize(self):
-        pass
-
-    def mutate(self):
         pass
 
 
