@@ -71,7 +71,13 @@ class NeuralNet:
 
     @staticmethod
     def sigmoid(x):
-        return 1 / (1 + math.exp(-x))
+        try:
+            return 1 / (1 + math.exp(-x))
+        except OverflowError:
+            print(x, ' overflow')
+            x = -x
+            return 1 / (1 + math.exp(x))
+
 
 
 class AIPaddle:

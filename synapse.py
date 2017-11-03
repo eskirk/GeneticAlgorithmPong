@@ -2,8 +2,8 @@ import random
 
 
 class Synapse:
-    def __init__(self, start_neuron, end_neuron, weight=None):
-        if weight is None:
+    def __init__(self, start_neuron, end_neuron, weight=0):
+        if weight == 0:
             self.randomize()
         else:
             self.weight = weight
