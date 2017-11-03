@@ -1,6 +1,5 @@
 import pygame
 import math
-import pprint
 from neuron import Neuron
 from synapse import Synapse
 
@@ -18,6 +17,7 @@ class NeuralNet:
         self.inputs = [Neuron() for _ in range(num_inputs)]
         self.hidden_layers = [[Neuron() for _ in range(num_neurons)] for _ in range(num_hidden_layers)]
         self.synapses = [[] for _ in range(num_hidden_layers + 1)]
+        self.num_hidden_layers = num_hidden_layers
         self.init_synapses()
 
         for synapse_layer in self.synapses:
@@ -37,6 +37,33 @@ class NeuralNet:
         for neuron in self.hidden_layers[len(self.hidden_layers) - 1]:
             self.synapses[len(self.synapses) - 1].append(Synapse(neuron, self.output))
 
+    # inputs[0] = ball x position
+    # inputs[1] = ball speed
+    # inputs[2] = cpu paddle x position
+    def get_output(self, inputs):
+        # set the value of the input neurons to the input values passed in
+        n = 0
+        for inp in self.inputs:
+            inp.set_value(inputs[n])
+            n += 1
+
+        # go through each of the synapses and add the values to the next layer of neurons
+        for i in range(self.num_hidden_layers):
+            for synapse in self.synapses[i]:
+                synapse.end_neuron.add_value(synapse.start_neuron.get_value())
+            # once all the values have been added together, apply the sigmoid to the final value of the neuron
+            for neuron in self.hidden_layers[i]:
+                neuron.set_value(self.sigmoid(neuron.get_value()))
+
+        # generate the final value by adding all the final layers values together
+        for synapse in self.synapses[self.num_hidden_layers]:
+            synapse.end_neuron.add_value(synapse.start_neuron.get_value())
+
+        # apply the sigmoid function to the final neuron's value
+        self.output.set_value(self.sigmoid(self.hidden_layers[self.num_hidden_layers][0]))
+
+        return self.output.get_value()
+
     def init_output(self):
         self.output = Neuron()
 
@@ -49,9 +76,6 @@ class NeuralNet:
 
     def sigmoid(self, x):
         return 1 / (1 + math.exp(-x))
-
-    def randomize(self):
-        pass
 
 
 class AIPaddle:
