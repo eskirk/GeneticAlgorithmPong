@@ -9,7 +9,7 @@ class Neuron:
             self.value = value
 
     def __repr__(self):
-        return '{0:.2f}'.format(self.value)
+        return '{0:.10f}'.format(self.value)
 
     def randomize(self):
         self.value = random.uniform(0, 1)

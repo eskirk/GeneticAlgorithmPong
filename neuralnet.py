@@ -56,14 +56,16 @@ class NeuralNet:
         for i in range(self.num_hidden_layers):
             for synapse in self.synapses[i]:
                 synapse.end_neuron.add_value(synapse.start_neuron.get_value())
+                print(synapse.end_neuron, 'pre sigmoid')
+            print(self.hidden_layers[0], ' hidden layers')
             # once all the values have been added together, apply the sigmoid to the final value of the neuron
             for neuron in self.hidden_layers[i]:
                 neuron.set_value(self.sigmoid(neuron.get_value()))
+                print(neuron, 'post sigmoid')
 
         # generate the final value by adding all the final layers values together
-        for synapses in self.synapses[self.num_hidden_layers]:
-            for synapse in synapses:
-                synapse.end_neuron.add_value(synapse.start_neuron.get_value())
+        for synapse in self.synapses[self.num_hidden_layers]:
+            synapse.end_neuron.add_value(synapse.start_neuron.get_value())
 
         # apply the sigmoid function to the final neuron's value
         self.output.set_value(NeuralNet.sigmoid(self.output.get_value()))
@@ -101,4 +103,8 @@ class AIPaddle:
 
 if __name__ == '__main__':
     net = NeuralNet(3, 1, 3)
+    inps = [.02, .05, 0.1]
+    print('Inputs: ', inps)
+    print(net.get_output(inps))
+
 
