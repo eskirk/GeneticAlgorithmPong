@@ -71,6 +71,10 @@ class NeuralNet:
 
     @staticmethod
     def sigmoid(x):
+        if x > 700:
+            x = 700
+        elif x < -700:
+            x = -700
         try:
             return 1 / (1 + math.exp(-x))
         except OverflowError:
