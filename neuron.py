@@ -2,11 +2,8 @@ import random
 
 
 class Neuron:
-    def __init__(self, value=None):
-        if value is None:
-            self.randomize()
-        else:
-            self.value = value
+    def __init__(self, value=0):
+        self.value = value
 
     def __repr__(self):
         return '{0:.10f}'.format(self.value)
