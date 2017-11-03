@@ -15,19 +15,27 @@ class NeuralNet:
         self.fitness = None
         self.output = Neuron()
         self.inputs = [Neuron() for _ in range(num_inputs)]
-        self.neurons = [[Neuron() for _ in range(num_neurons)] for _ in range(num_hidden_layers)]
+        self.hidden_layers = [[Neuron() for _ in range(num_neurons)] for _ in range(num_hidden_layers)]
         self.synapses = [[] for _ in range(num_hidden_layers + 1)]
         self.num_hidden_layers = num_hidden_layers
         self.init_synapses()
 
+        for synapse_layer in self.synapses:
+            for synapse in synapse_layer:
+                print(synapse)
+            print()
+
     def init_synapses(self):
         # link inputs and first hidden layer
         for input_ndx, input_neuron in enumerate(self.inputs):
-            for neuron in self.neurons[0]:
-                self.synapses[input_ndx].append(Synapse(input_neuron, neuron))
+            for neuron in self.hidden_layers[0]:
+                self.synapses[0].append(Synapse(input_neuron, neuron))
 
-    def init_output(self):
-        self.output = Neuron()
+        # link rest of hidden layers
+
+        # link last layer to output
+        for neuron in self.hidden_layers[len(self.hidden_layers) - 1]:
+            self.synapses[len(self.synapses) - 1].append(Synapse(neuron, self.output))
 
     # inputs[0] = ball x position
     # inputs[1] = ball speed
@@ -44,7 +52,7 @@ class NeuralNet:
             for synapse in self.synapses[i]:
                 synapse.end_neuron.add_value(synapse.start_neuron.get_value())
             # once all the values have been added together, apply the sigmoid to the final value of the neuron
-            for neuron in self.neurons[i]:
+            for neuron in self.hidden_layers[i]:
                 neuron.set_value(self.sigmoid(neuron.get_value()))
 
         # generate the final value by adding all the final layers values together
