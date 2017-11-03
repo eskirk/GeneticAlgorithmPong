@@ -17,7 +17,7 @@ class NeuralNet:
         self.inputs = [Neuron() for _ in range(num_inputs)]
         self.neurons = [[Neuron() for _ in range(num_neurons)] for _ in range(num_hidden_layers)]
         self.synapses = [[] for _ in range(num_hidden_layers + 1)]
-        self.layers = num_hidden_layers
+        self.num_hidden_layers = num_hidden_layers
         self.init_synapses()
 
     def init_synapses(self):
@@ -32,7 +32,7 @@ class NeuralNet:
     # inputs[0] = ball x position
     # inputs[1] = ball speed
     # inputs[2] = cpu paddle x position
-    def get_outputs(self, inputs):
+    def get_output(self, inputs):
         # set the value of the input neurons to the input values passed in
         n = 0
         for inp in self.inputs:
@@ -40,7 +40,7 @@ class NeuralNet:
             n += 1
 
         # go through each of the synapses and add the values to the next layer of neurons
-        for i in range(self.layers):
+        for i in range(self.num_hidden_layers):
             for synapse in self.synapses[i]:
                 synapse.end_neuron.add_value(synapse.start_neuron.get_value())
             # once all the values have been added together, apply the sigmoid to the final value of the neuron
@@ -48,15 +48,17 @@ class NeuralNet:
                 neuron.set_value(self.sigmoid(neuron.get_value()))
 
         # generate the final value by adding all the final layers values together
-        for synapse in self.synapses[self.layers]:
-            synapse.end_neuron.add_value(synapse.start_neuron.get_value())
+        for synapses in self.synapses[self.num_hidden_layers]:
+            for synapse in synapses:
+                synapse.end_neuron.add_value(synapse.start_neuron.get_value())
 
         # apply the sigmoid function to the final neuron's value
-        self.output.set_value(self.sigmoid(self.neurons[self.layers][0]))
+        self.output.set_value(NeuralNet.sigmoid(self.output.get_value()))
 
         return self.output.get_value()
 
-    def sigmoid(self, x):
+    @staticmethod
+    def sigmoid(x):
         return 1 / (1 + math.exp(-x))
 
 
