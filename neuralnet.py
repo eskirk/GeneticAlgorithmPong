@@ -1,6 +1,5 @@
 import pygame
 import math
-import pprint
 from neuron import Neuron
 from synapse import Synapse
 
@@ -34,7 +33,12 @@ class NeuralNet:
     # inputs[1] = ball speed
     # inputs[2] = cpu paddle x position
     def get_outputs(self, inputs):
-        self.inputs = inputs
+        # set the value of the input neurons to the input values passed in
+        n = 0
+        for inp in self.inputs:
+            inp.set_value(inputs[n])
+            n += 1
+
         # go through each of the synapses and add the values to the next layer of neurons
         for i in range(self.layers):
             for synapse in self.synapses[i]:
@@ -48,9 +52,9 @@ class NeuralNet:
             synapse.end_neuron.add_value(synapse.start_neuron.get_value())
 
         # apply the sigmoid function to the final neuron's value
-        output = self.sigmoid(self.neurons[self.layers][0])
+        self.output.set_value(self.sigmoid(self.neurons[self.layers][0]))
 
-        return output
+        return self.output.get_value()
 
     # set current genome fit, if all genomes have been set,
     # create a new generation
