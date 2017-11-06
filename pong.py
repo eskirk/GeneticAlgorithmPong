@@ -16,7 +16,8 @@ class PongGame:
         self.paddle1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, self.ball, self)
         self.paddle2 = AIPaddle(50, PongGame.window_height / 2, self.ball, self)
         # self.paddle2 = NNPaddle(50, PongGame.window_height / 2, self.ball, self)
-        self.temp_cpu_move_down = True
+        self.winner = None
+        self.game_over = False
 
         self.start_game()
 
@@ -27,7 +28,8 @@ class PongGame:
         display = pygame.display.set_mode((PongGame.window_width, PongGame.window_height))
         pygame.display.set_caption('Neural Net Pong')
 
-        while True:
+        while not self.game_over:
+
             delta = clock.tick(60) / 1000
             display.fill((255, 255, 255))
 
@@ -46,7 +48,7 @@ class PongGame:
 
             self.ball.move(delta)
 
-            self.handle_offscreen()
+            self.game_over = self.handle_offscreen()
 
             self.draw(display)
             flip = pygame.display.flip()
@@ -75,10 +77,22 @@ class PongGame:
             self.ball.vel_y = -self.ball.vel_y
 
     def handle_offscreen(self):
+        if self.paddle1.score >= 3:
+            self.winner = self.paddle1
+            return True
+        elif self.paddle2.score >= 3:
+            self.winner = self.paddle2
+            return True
+        
         if self.ball.bounds.x + self.ball.bounds.width > PongGame.window_width or self.ball.bounds.x <= 0:
+            if self.ball.bounds.x <= 0:
+                self.paddle1.score += 1
+            else:
+                self.paddle2.score += 1
             self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
             self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)
             self.paddle2.reset(50, PongGame.window_height / 2, self.ball)
+        return False
 
 
 def main():

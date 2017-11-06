@@ -19,10 +19,10 @@ class Ball:
 
     def intersects_paddle(self, cpu_paddle, human_paddle):
         if (self.bounds.x <= cpu_paddle.bounds.x + cpu_paddle.bounds.width and cpu_paddle.bounds.y <= self.bounds.y <= cpu_paddle.bounds.y + cpu_paddle.bounds.height):
-            cpu_paddle.score += 1
+            # cpu_paddle.score += 1
             return True
         elif (self.bounds.x + self.bounds.width >= human_paddle.bounds.x and human_paddle.bounds.y <= self.bounds.y <= human_paddle.bounds.y + human_paddle.bounds.height):
-            human_paddle.score += 1
+            # human_paddle.score += 1
             return True
         return False
 

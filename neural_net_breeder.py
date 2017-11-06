@@ -1,37 +1,44 @@
-from neuralnet import NeuralNet
+from neuralnet import NeuralNet, AIPaddle, NNPaddle
+from pong import PongGame
+from ball import Ball
 
 
 class NeuralNetBreeder:
     def __init__(self, population_size):
         self.population = []
+        self.games = []
         self.generation = 0
         self.population_size = population_size
 
     def start_breeding(self):
         self.create_new_population()
+        winners = []
 
-        while True:
-            for network in self.population:
-                # play the game using this neural net and record the fitness function
-                network.play_game()
-
-            best_network = self.breed_best()
-            best_network.mutate()
-            self.create_new_population(starting_network=best_network)
-            self.generation += 1
+        for game in self.games:
+            # play the game using this neural net and record the fitness function
+            game.play_game()
+            while not game.game_over:
+                pass
+            winners.append(game.winner)
+        print(winners)
 
     def create_new_population(self, starting_network=None):
         population = []
         temp_population_size = self.population_size
         if starting_network:
-            population.append(starting_network)
+            population.extend(starting_network)
             temp_population_size -= 1
 
         for ndx in range(temp_population_size):
-            network = NeuralNet()
-            network.randomize()
+            ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
+            game = PongGame()
+            game.ball = ball
+            ai_1 = NNPaddle(PongGame.window_width / 2, PongGame.window_height / 2, ball, game)
+            ai_2 = NNPaddle(50, PongGame.window_height / 2, ball, game)
 
-            population.append(network)
+            population.append(ai_1)
+            population.append(ai_2)
+            self.games.append(game)
 
         self.population = population
 
@@ -64,6 +71,10 @@ class NeuralNetBreeder:
     def mutate(self):
         pass
 
+
+if __name__ == '__main__':
+    breeder = NeuralNetBreeder(10)
+    breeder.start_breeding()
 
 
 

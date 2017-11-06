@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 
 from neuron import Neuron
 from synapse import Synapse
@@ -104,7 +105,6 @@ class AIPaddle:
                 self.move_up(delta)
 
     def reset(self, x_pos, y_pos, ball):
-        from pong import PongGame
         self.ball = ball
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
 
@@ -116,9 +116,27 @@ class NNPaddle:
         self.game = game
         self.net = NeuralNet(4, 1, 3)
         self.score = 0
+        self.colors = None
+        self.color_ndx = 0
+        self.seizure_reduction = 0
+        self.seize_rate = random.uniform(0, 15)
 
     def draw(self, display):
-        pygame.draw.rect(display, (0, 0, 255), self.bounds)
+        random.seed()
+        if self.colors is None:
+            color_1 = (random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
+            color_2 = (random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
+            color_3 = (random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
+            color_4 = (random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
+            self.colors = [color_1, color_2, color_3, color_4]
+            self.color_ndx = 0
+            self.color_ndx = int(random.uniform(0, 4))
+        self.seizure_reduction += 1
+        if self.seizure_reduction > self.seize_rate:
+            self.color_ndx = int(random.uniform(0, 4))
+            self.seizure_reduction = 0
+
+        pygame.draw.rect(display, (self.colors[self.color_ndx]), self.bounds)
 
     def move_up(self, delta):
         self.bounds = self.bounds.move(0, -250 * delta)
@@ -143,7 +161,6 @@ class NNPaddle:
                 self.move_up(delta)
 
     def reset(self, x_pos, y_pos, ball):
-        from pong import PongGame
         self.ball = ball
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
 
