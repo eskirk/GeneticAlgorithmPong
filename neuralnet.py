@@ -2,6 +2,7 @@ import pygame
 import math
 from neuron import Neuron
 from synapse import Synapse
+from pong import PongGame
 
 
 class NeuralNet:
@@ -24,6 +25,7 @@ class NeuralNet:
             for synapse in synapse_layer:
                 print(synapse)
             print()
+        print(self.hidden_layers, ' hidden layers, pre inputs')
 
     def init_synapses(self):
         # link inputs and first hidden layer
@@ -50,7 +52,6 @@ class NeuralNet:
             n += 1
 
         # go through each of the synapses and add the values to the next layer of neurons
-        print(self.hidden_layers[0], ' hidden layers, pre inputs')
         for i in range(self.num_hidden_layers):
             for synapse in self.synapses[i]:
                 synapse.end_neuron.add_value(synapse.weight * synapse.start_neuron.get_value())
@@ -66,6 +67,7 @@ class NeuralNet:
 
         # apply the sigmoid function to the final neuron's value
         self.output.set_value(NeuralNet.sigmoid(self.output.get_value()))
+        print(self.output, ' final layer, post sigmoid')
 
         return self.output.get_value()
 
@@ -131,6 +133,7 @@ class NNPaddle:
         ball_vel_y = self.ball.vel_y
         inputs = [y_pos, ball_y, ball_vel_x, ball_vel_y]
 
+        print(inputs, ' inputs')
         output = self.net.get_output(inputs)
         if output > 0.5:
             if self.bounds.y + self.bounds.height < self.game.window_height:
@@ -138,6 +141,9 @@ class NNPaddle:
         else:
             if self.bounds.y > 0:
                 self.move_up(delta)
+
+    def reset(self):
+        self.bounds = pygame.Rect(50, PongGame.window_height / 2, 15, 100)
 
 
 if __name__ == '__main__':

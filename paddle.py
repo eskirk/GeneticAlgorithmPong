@@ -1,4 +1,5 @@
 import pygame
+from pong import PongGame
 
 
 class Paddle:
@@ -13,6 +14,9 @@ class Paddle:
 
     def move_down(self, delta):
         self.bounds = self.bounds.move(0, 250 * delta)
+
+    def reset(self):
+        self.bounds = pygame.Rect(PongGame.window_width - 50, PongGame.window_height / 2, 15, 100)
 
 
 

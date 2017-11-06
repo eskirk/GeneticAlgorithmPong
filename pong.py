@@ -79,8 +79,8 @@ class PongGame:
     def handle_offscreen(self):
         if self.ball.bounds.x + self.ball.bounds.width > PongGame.window_width or self.ball.bounds.x <= 0:
             self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
-            self.cpu_paddle = NNPaddle(50, PongGame.window_height / 2, self.ball, self)
-            self.human_paddle = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, self.ball, self)
+            self.cpu_paddle.reset()
+            self.human_paddle.reset()
 
 
 def main():
