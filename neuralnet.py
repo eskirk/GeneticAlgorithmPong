@@ -1,18 +1,12 @@
 import pygame
 import math
+
 from neuron import Neuron
 from synapse import Synapse
-from pong import PongGame
 
 
 class NeuralNet:
     def __init__(self, num_inputs, num_hidden_layers, num_neurons):
-        # Copy constructor parameters
-        # Create fits array
-        # Generate neurons
-        # Set biases to 1
-        # Generate synapses
-
         self.fitness = None
         self.output = Neuron()
         self.inputs = [Neuron() for _ in range(num_inputs)]
@@ -85,12 +79,12 @@ class NeuralNet:
             return 1 / (1 + math.exp(x))
 
 
-
 class AIPaddle:
     def __init__(self, x_pos, y_pos, ball, game):
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
         self.ball = ball
         self.game = game
+        self.score = 0
 
     def draw(self, display):
         pygame.draw.rect(display, (0, 0, 255), self.bounds)
@@ -109,6 +103,11 @@ class AIPaddle:
             if self.bounds.y > 0:
                 self.move_up(delta)
 
+    def reset(self, x_pos, y_pos, ball):
+        from pong import PongGame
+        self.ball = ball
+        self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
+
 
 class NNPaddle:
     def __init__(self, x_pos, y_pos, ball, game):
@@ -116,6 +115,7 @@ class NNPaddle:
         self.ball = ball
         self.game = game
         self.net = NeuralNet(4, 1, 3)
+        self.score = 0
 
     def draw(self, display):
         pygame.draw.rect(display, (0, 0, 255), self.bounds)
@@ -142,11 +142,15 @@ class NNPaddle:
             if self.bounds.y > 0:
                 self.move_up(delta)
 
-    def reset(self):
-        self.bounds = pygame.Rect(50, PongGame.window_height / 2, 15, 100)
+    def reset(self, x_pos, y_pos, ball):
+        from pong import PongGame
+        self.ball = ball
+        self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
 
 
 if __name__ == '__main__':
+    net = NeuralNet(4, 1, 3)
+    inps = [0, 0, 0, 0]
     print('Inputs: ', inps)
     print('Output:', net.get_output(inps))
 

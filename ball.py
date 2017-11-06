@@ -18,4 +18,14 @@ class Ball:
         return self.bounds.x, self.bounds.y
 
     def intersects_paddle(self, cpu_paddle, human_paddle):
-        return (self.bounds.x <= cpu_paddle.bounds.x + cpu_paddle.bounds.width and cpu_paddle.bounds.y <= self.bounds.y <= cpu_paddle.bounds.y + cpu_paddle.bounds.height) or (self.bounds.x + self.bounds.width >= human_paddle.bounds.x and human_paddle.bounds.y <= self.bounds.y <= human_paddle.bounds.y + human_paddle.bounds.height)
+        if (self.bounds.x <= cpu_paddle.bounds.x + cpu_paddle.bounds.width and cpu_paddle.bounds.y <= self.bounds.y <= cpu_paddle.bounds.y + cpu_paddle.bounds.height):
+            cpu_paddle.score += 1
+            return True
+        elif (self.bounds.x + self.bounds.width >= human_paddle.bounds.x and human_paddle.bounds.y <= self.bounds.y <= human_paddle.bounds.y + human_paddle.bounds.height):
+            human_paddle.score += 1
+            return True
+        return False
+
+    def reset(self):
+        from pong import PongGame
+        self.bounds = pygame.Rect(PongGame.window_width / 2, PongGame.window_height / 2, 15, 15)
