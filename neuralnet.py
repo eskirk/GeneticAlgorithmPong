@@ -86,6 +86,7 @@ class AIPaddle:
         self.ball = ball
         self.game = game
         self.score = 0
+        self.name = 'AIPaddle'
 
     def draw(self, display):
         pygame.draw.rect(display, (0, 0, 255), self.bounds)
@@ -116,6 +117,8 @@ class NNPaddle:
         self.game = game
         self.net = NeuralNet(4, 1, 3)
         self.score = 0
+        self.name = 'NNPaddle'
+
         self.colors = None
         self.color_ndx = 0
         self.seizure_reduction = 0

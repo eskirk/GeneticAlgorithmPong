@@ -18,6 +18,7 @@ class PongGame:
         # self.paddle2 = NNPaddle(50, PongGame.window_height / 2, self.ball, self)
         self.winner = None
         self.game_over = False
+        self.scores = [0, 0]
 
         self.start_game()
 
@@ -57,6 +58,11 @@ class PongGame:
         self.paddle1.draw(display)
         self.paddle2.draw(display)
         self.ball.draw(display)
+        font = pygame.font.Font(None, 25)
+        score = font.render(self.paddle1.name + ' | ' + str(self.scores[0]) + ' - ' + str(self.scores[1]) + ' | ' +
+                            self.paddle2.name, True, (0, 0, 0))
+        rect = score.get_rect(center=(250, 60))
+        display.blit(score, rect)
 
     def handle_input(self, delta):
         # listen for key presses
@@ -73,7 +79,7 @@ class PongGame:
             self.ball.vel_x *= 1.1
             self.ball.vel_y *= 1.1
         # collision with ceiling
-        elif self.ball.bounds.y <= 0 or self.ball.bounds.y + self.ball.bounds.height >= PongGame.window_height:
+        elif (self.ball.bounds.y <= 0 and self.ball.vel_y < 0)or (self.ball.bounds.y + self.ball.bounds.height >= PongGame.window_height and self.ball.vel_y > 0):
             self.ball.vel_y = -self.ball.vel_y
 
     def handle_offscreen(self):
@@ -87,8 +93,10 @@ class PongGame:
         if self.ball.bounds.x + self.ball.bounds.width > PongGame.window_width or self.ball.bounds.x <= 0:
             if self.ball.bounds.x <= 0:
                 self.paddle1.score += 1
+                self.scores[1] += 1
             else:
                 self.paddle2.score += 1
+                self.scores[0] += 1
             self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
             self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)
             self.paddle2.reset(50, PongGame.window_height / 2, self.ball)
