@@ -16,12 +16,6 @@ class NeuralNet:
         self.num_hidden_layers = num_hidden_layers
         self.init_synapses()
 
-        for synapse_layer in self.synapses:
-            for synapse in synapse_layer:
-                print(synapse)
-            print()
-        print(self.hidden_layers, ' hidden layers, pre inputs')
-
     def init_synapses(self):
         # link inputs and first hidden layer
         for input_ndx, input_neuron in enumerate(self.inputs):
@@ -122,6 +116,9 @@ class NNPaddle:
         self.seizure_reduction = 0
         self.seize_rate = random.uniform(0, 15)
 
+    def __repr__(self):
+        return str(self.name) + ' : ' + str(self.fitness)
+
     def draw(self, display):
         random.seed()
         if self.colors is None:
@@ -165,12 +162,26 @@ class NNPaddle:
         self.ball = ball
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
 
+    def save_genome(self):
+        path = './genomes/' + str(self.name)
+        f = open(path, 'w+')
+
+        for synapse in self.net.synapses:
+            f.write(str(synapse))
+
     @staticmethod
     def random_name():
         names = ['Cheenis', 'Garreth', 'Baxter', 'Slidey', 'McPong', 'Slidey McPong', 'Jeeves', 'Jacob', 'Bool',
                  'Don Cheenal', 'Don', 'Cheenal', 'Stanley', 'Alexa', 'The Pacer Test', 'Finn', 'Daniel', 'Dan the Man',
                  'Dad', 'The Alamo', 'Grobgobbler', 'Gavin', 'Doyle', '@RealGavin']
-        return random.choice(names)
+        if random.uniform(0, 1) > 0.5:
+            return random.choice(names)
+        else:
+            temp_names = list(names)
+            f_name = random.choice(temp_names)
+            temp_names.remove(f_name)
+            l_name = random.choice(temp_names)
+            return f_name + ' ' + l_name
 
 
 if __name__ == '__main__':

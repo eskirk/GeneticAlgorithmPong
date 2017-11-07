@@ -31,7 +31,7 @@ class PongGame:
 
         while not self.game_over:
 
-            delta = clock.tick(60) / 1000
+            delta = clock.tick(60) / 500
             display.fill((255, 255, 255))
 
             # listen for events
