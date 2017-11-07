@@ -20,8 +20,6 @@ class PongGame:
         self.game_over = False
         self.scores = [0, 0]
 
-        self.start_game()
-
     def start_game(self):
         pygame.init()
 

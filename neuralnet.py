@@ -52,7 +52,7 @@ class NeuralNet:
 
         # apply the sigmoid function to the final neuron's value
         self.output.set_value(NeuralNet.sigmoid(self.output.get_value()))
-        print(self.output, ' final layer, post sigmoid')
+        # print(self.output, ' final layer, post sigmoid')
 
         return self.output.get_value()
 
@@ -107,6 +107,7 @@ class NNPaddle:
         self.ball = ball
         self.game = game
         self.net = NeuralNet(4, 1, 3)
+        self.generation = 0
         self.score = 0
         self.fitness = 0
         self.name = self.random_name()
@@ -149,7 +150,7 @@ class NNPaddle:
         ball_vel_y = self.ball.vel_y
         inputs = [y_pos, ball_y, ball_vel_x, ball_vel_y]
 
-        print(inputs, ' inputs')
+        # print(inputs, ' inputs')
         output = self.net.get_output(inputs)
         if output > 0.5:
             if self.bounds.y + self.bounds.height < self.game.window_height:

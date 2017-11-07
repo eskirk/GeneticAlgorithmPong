@@ -10,17 +10,20 @@ class NeuralNetBreeder:
         self.population = []
         self.games = []
         self.generation = 0
+        self.best = []
         self.population_size = population_size
 
     def start_breeding(self):
         self.create_new_population()
+        self.generation += 1
         population = []
 
         for game in self.games:
             # play the game using this neural net and record the fitness function
+            game.paddle1.ball = game.ball
+            game.paddle2.ball = game.ball
+
             game.start_game()
-            while not game.game_over:
-                pass
             population.append(game.paddle1)
 
         population = sorted(population, key=lambda x: x.fitness, reverse=True)
@@ -41,11 +44,12 @@ class NeuralNetBreeder:
             ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
             game = PongGame()
             game.ball = ball
-            ai_1 = NNPaddle(PongGame.window_width / 2, PongGame.window_height / 2, ball, game)
-            ai_2 = NNPaddle(50, PongGame.window_height / 2, ball, game)
+            ai_1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, ball, game)
+            # ai_2 = NNPaddle(50, PongGame.window_height / 2, ball, game)
+            game.paddle1 = ai_1
 
             population.append(ai_1)
-            population.append(ai_2)
+            # population.append(ai_2)
             self.games.append(game)
 
         self.population = population
@@ -57,11 +61,6 @@ class NeuralNetBreeder:
         for p in population[::-1]:
             p.save_genome()
 
-        # neural net sex
-
-        # return super child
-
-        # return best  # need to actually do the sex part
 
     # set current genome fit, if all genomes have been set,
     # create a new generation
@@ -93,6 +92,7 @@ class NeuralNetBreeder:
         offspring.name = f_name + ' ' + l_name
 
         print(offspring.name)
+        return offspring
 
     def randomize(self):
         pass
@@ -108,7 +108,12 @@ def main():
         breeder = NeuralNetBreeder(10)
     pop = breeder.start_breeding()
     breeder.breed_best(pop)
-    breeder.crossover(pop[0], pop[1])
+    offspring = breeder.crossover(pop[0], pop[1])
+
+    game = PongGame()
+    offspring.ball = game.ball
+    game.paddle1 = offspring
+    game.start_game()
 
 
 if __name__ == '__main__':
