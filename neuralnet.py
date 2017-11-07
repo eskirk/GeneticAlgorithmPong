@@ -41,16 +41,13 @@ class NeuralNet:
 
     def get_output(self, inputs):
         # set the value of the input neurons to the input values passed in
-        n = 0
-        for inp in self.inputs:
-            inp.set_value(inputs[n])
-            n += 1
+        for inp in enumerate(inputs):
+            self.inputs[inp[0]].set_value(inp[1])
 
         # go through each of the synapses and add the values to the next layer of neurons
         for i in range(self.num_hidden_layers):
             for synapse in self.synapses[i]:
                 synapse.end_neuron.add_value(synapse.weight * synapse.start_neuron.get_value())
-            print(self.hidden_layers[0], ' hidden layers, post inputs')
             # once all the values have been added together, apply the sigmoid to the final value of the neuron
             for neuron in self.hidden_layers[i]:
                 neuron.set_value(NeuralNet.sigmoid(neuron.get_value()))
@@ -58,7 +55,6 @@ class NeuralNet:
         # generate the final value by adding all the final layers values together
         for synapse in self.synapses[self.num_hidden_layers]:
             synapse.end_neuron.add_value(synapse.weight * synapse.start_neuron.get_value())
-        print(self.output, ' final layer, pre sigmoid')
 
         # apply the sigmoid function to the final neuron's value
         self.output.set_value(NeuralNet.sigmoid(self.output.get_value()))
