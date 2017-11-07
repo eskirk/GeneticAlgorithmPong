@@ -40,27 +40,23 @@ class PongGame:
                     sys.exit()
 
             self.handle_input(delta)
-
             self.handle_collisions()
-
             # super super advanced AI
             self.paddle1.follow_ball(delta)
             self.paddle2.follow_ball(delta)
-
             self.ball.move(delta)
-
             self.game_over = self.handle_offscreen()
 
             self.draw(display)
-            flip = pygame.display.flip()
+            pygame.display.flip()
 
     def draw(self, display):
         self.paddle1.draw(display)
         self.paddle2.draw(display)
         self.ball.draw(display)
         font = pygame.font.Font(None, 25)
-        score = font.render(self.paddle1.name + ' | ' + str(self.scores[0]) + ' - ' + str(self.scores[1]) + ' | ' +
-                            self.paddle2.name, True, (0, 0, 0))
+        score = font.render(self.paddle2.name + ' | ' + str(self.scores[1]) + ' - ' + str(self.scores[0]) + ' | ' +
+                            self.paddle1.name, True, (0, 0, 0))
         rect = score.get_rect(center=(250, 60))
         display.blit(score, rect)
 
@@ -93,10 +89,12 @@ class PongGame:
         if self.ball.bounds.x + self.ball.bounds.width > PongGame.window_width or self.ball.bounds.x <= 0:
             if self.ball.bounds.x <= 0:
                 self.paddle1.score += 1
-                self.scores[1] += 1
+                self.paddle1.fitness += 3
+                self.scores[0] += 1
             else:
                 self.paddle2.score += 1
-                self.scores[0] += 1
+                self.paddle2.fitness += 3
+                self.scores[1] += 1
             self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
             self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)
             self.paddle2.reset(50, PongGame.window_height / 2, self.ball)

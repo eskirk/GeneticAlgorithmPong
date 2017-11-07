@@ -82,6 +82,7 @@ class AIPaddle:
         self.ball = ball
         self.game = game
         self.score = 0
+        self.fitness = 0
         self.name = 'AIPaddle'
 
     def draw(self, display):
@@ -113,7 +114,8 @@ class NNPaddle:
         self.game = game
         self.net = NeuralNet(4, 1, 3)
         self.score = 0
-        self.name = 'NNPaddle'
+        self.fitness = 0
+        self.name = self.random_name()
 
         self.colors = None
         self.color_ndx = 0
@@ -162,6 +164,13 @@ class NNPaddle:
     def reset(self, x_pos, y_pos, ball):
         self.ball = ball
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
+
+    @staticmethod
+    def random_name():
+        names = ['Cheenis', 'Garreth', 'Baxter', 'Slidey', 'McPong', 'Slidey McPong', 'Jeeves', 'Jacob', 'Bool',
+                 'Don Cheenal', 'Don', 'Cheenal', 'Stanley', 'Alexa', 'The Pacer Test', 'Finn', 'Daniel', 'Dan the Man',
+                 'Dad', 'The Alamo', 'Grobgobbler', 'Gavin', 'Doyle', '@RealGavin']
+        return random.choice(names)
 
 
 if __name__ == '__main__':
