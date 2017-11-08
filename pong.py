@@ -65,6 +65,8 @@ class PongGame:
             self.paddle1.move_up(delta)
         if keys[pygame.K_DOWN] and self.paddle1.bounds.y + self.paddle1.bounds.height < PongGame.window_height:
             self.paddle1.move_down(delta)
+        if keys[pygame.K_r]:
+            self.reset()
 
     def handle_collisions(self):
         # collision with human paddle
@@ -97,6 +99,16 @@ class PongGame:
             self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)
             self.paddle2.reset(50, PongGame.window_height / 2, self.ball)
         return False
+
+    def reset(self):
+        self.ball.reset()
+        self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)
+        self.paddle1.fitness = 0
+        self.paddle1.score = 0
+        self.paddle2.reset(50, PongGame.window_height / 2, self.ball)
+        self.paddle2.score = 0
+        self.scores = [0, 0]
+
 
 
 def main():

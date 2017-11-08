@@ -118,7 +118,7 @@ class NNPaddle:
         self.seize_rate = random.uniform(0, 15)
 
     def __repr__(self):
-        return str(self.name) + ' : ' + str(self.fitness)
+        return str(self.name) + ' : ' + str(self.fitness) + ', gen: ' + str(self.generation)
 
     def draw(self, display):
         random.seed()
@@ -168,13 +168,23 @@ class NNPaddle:
         f = open(path, 'w+')
 
         for synapse in self.net.synapses:
-            f.write(str(synapse))
+            f.write(str(synapse) + '\n')
+        f.write(self.name + '\n')
+        f.write(str(self.generation) + '\n')
+        f.write(str(self.colors))
+        f.close()
+
+    def load_genomes(self, file):
+        f = open(file)
+
+        # for line in f:
 
     @staticmethod
     def random_name():
         names = ['Cheenis', 'Garreth', 'Baxter', 'Slidey', 'McPong', 'Slidey McPong', 'Jeeves', 'Jacob', 'Bool',
-                 'Don Cheenal', 'Don', 'Cheenal', 'Stanley', 'Alexa', 'The Pacer Test', 'Finn', 'Daniel', 'Dan the Man',
-                 'Dad', 'The Alamo', 'Grobgobbler', 'Gavin', 'Doyle', '@RealGavin']
+                 'Don Cheedle', 'Don', 'Cheedle', 'Stanley', 'Alexa', 'The Pacer Test', 'Finn', 'Daniel', 'Dan the Man',
+                 'Dad', 'The Alamo', 'Grobgobbler', 'Gavin', 'Doyle', '@RealGavin', 'Juul', 'Bruul', 'Dr.', 'Bichael',
+                 'Flats', 'Andrew', 'Farquaad']
         if random.uniform(0, 1) > 0.5:
             return random.choice(names)
         else:

@@ -15,7 +15,6 @@ class NeuralNetBreeder:
 
     def start_breeding(self):
         self.create_new_population()
-        self.generation += 1
         population = []
 
         for game in self.games:
@@ -25,13 +24,13 @@ class NeuralNetBreeder:
 
             game.start_game()
             population.append(game.paddle1)
+            print(game.paddle1)
 
-        population = sorted(population, key=lambda x: x.fitness, reverse=True)
+        population = sorted(population, key=lambda x: x.fitness)
         for individual in population:
             print(individual)
 
         return population
-
 
     def create_new_population(self, starting_network=None):
         population = []
@@ -45,6 +44,7 @@ class NeuralNetBreeder:
             game = PongGame()
             game.ball = ball
             ai_1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, ball, game)
+            ai_1.generation = self.generation
             # ai_2 = NNPaddle(50, PongGame.window_height / 2, ball, game)
             game.paddle1 = ai_1
 
@@ -53,14 +53,6 @@ class NeuralNetBreeder:
             self.games.append(game)
 
         self.population = population
-
-    def breed_best(self, population):
-        best, next_best = population[:2]
-
-        print(best, next_best)
-        for p in population[::-1]:
-            p.save_genome()
-
 
     # set current genome fit, if all genomes have been set,
     # create a new generation
@@ -75,23 +67,24 @@ class NeuralNetBreeder:
     # sort the genomes and cross them over with all other genomes
     def crossover(self, parent1, parent2):
         offspring = copy.deepcopy(parent1)
-        print(offspring.net.synapses)
+        offspring.fitness = 0
+        offspring.generation = self.generation
+        # print(offspring.net.synapses)
 
         for layer in range(len(offspring.net.synapses)):
             for synapse in range(len(offspring.net.synapses[layer])):
-                if random.uniform(0, 1) > 0.5:
-                    print('parent1')
+                if random.uniform(0, parent1.fitness + parent2.fitness) > parent2.fitness:
+                    # print('parent1')
                     offspring.net.synapses[layer][synapse].weight = parent1.net.synapses[layer][synapse].weight
                 else:
-                    print('parent2')
+                    # print('parent2')
                     offspring.net.synapses[layer][synapse].weight = parent2.net.synapses[layer][synapse].weight
+            offspring.colors = [parent1.colors[0], parent2.colors[1], parent1.colors[2], parent2.colors[3]]
             print()
-        print(offspring.net.synapses)
         f_name = random.choice(parent1.name.split())
         l_name = random.choice(parent2.name.split())
         offspring.name = f_name + ' ' + l_name
 
-        print(offspring.name)
         return offspring
 
     def randomize(self):
@@ -100,20 +93,42 @@ class NeuralNetBreeder:
     def mutate(self):
         pass
 
+    def evolve(self, pop):
+        self.generation += 1
+        population = list(sorted(pop, key=lambda x: x.fitness))
+        print('GENERATION: ', self.generation)
+        for p in population:
+            print(p)
+        children = []
+        while len(population) > 1:
+            parent1 = population.pop()
+            parent2 = population.pop()
+            offspring = self.crossover(parent1, parent2)
+            offspring.generation = self.generation
+
+            game = PongGame()
+            offspring.ball = game.ball
+            game.paddle1 = offspring
+            game.start_game()
+
+            print('parents: ', parent1, parent2)
+            print(offspring)
+            offspring.save_genome()
+            children.append(offspring)
+        if len(population) == 1:
+            children.append(population[0])
+        return children
+
 
 def main():
     if len(sys.argv) > 1:
         breeder = NeuralNetBreeder(int(sys.argv[1]))
     else:
         breeder = NeuralNetBreeder(10)
-    pop = breeder.start_breeding()
-    breeder.breed_best(pop)
-    offspring = breeder.crossover(pop[0], pop[1])
+    population = breeder.start_breeding()
 
-    game = PongGame()
-    offspring.ball = game.ball
-    game.paddle1 = offspring
-    game.start_game()
+    while len(population) > 1:
+        population = breeder.evolve(population)
 
 
 if __name__ == '__main__':

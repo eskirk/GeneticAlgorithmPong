@@ -8,6 +8,7 @@ class Ball:
         self.bounds = rect
         self.vel_x = random.choice([-150, 150])
         self.vel_y = random.choice([-150, 150])
+        self.last_hit = None
 
     def draw(self, display):
         pygame.draw.rect(display, (255, 0, 0), self.bounds)
@@ -18,14 +19,18 @@ class Ball:
     def get_position(self):
         return self.bounds.x, self.bounds.y
 
-    def intersects_paddle(self, cpu_paddle, human_paddle):
-        if self.bounds.x <= cpu_paddle.bounds.x + cpu_paddle.bounds.width \
-                and cpu_paddle.bounds.y <= self.bounds.y <= cpu_paddle.bounds.y + cpu_paddle.bounds.height:
-            cpu_paddle.fitness += 3
+    def intersects_paddle(self, paddle2, paddle1):
+        if self.bounds.x <= paddle2.bounds.x + paddle2.bounds.width \
+                and paddle2.bounds.y <= self.bounds.y <= paddle2.bounds.y + paddle2.bounds.height\
+                and self.last_hit != paddle2:
+            paddle2.fitness += 1
+            self.last_hit = paddle2
             return True
-        elif self.bounds.x + self.bounds.width >= human_paddle.bounds.x \
-                and human_paddle.bounds.y <= self.bounds.y <= human_paddle.bounds.y + human_paddle.bounds.height:
-            human_paddle.fitness += 3
+        elif self.bounds.x + self.bounds.width >= paddle1.bounds.x \
+                and paddle1.bounds.y <= self.bounds.y <= paddle1.bounds.y + paddle1.bounds.height\
+                and self.last_hit != paddle1:
+            paddle1.fitness += 1
+            self.last_hit = paddle1
             return True
         return False
 
