@@ -5,6 +5,7 @@ import sys
 import copy
 import random
 
+
 class NeuralNetBreeder:
     def __init__(self, population_size):
         self.population = []
@@ -12,33 +13,39 @@ class NeuralNetBreeder:
         self.generation = 0
         self.best = []
         self.population_size = population_size
+        self.cur_speed = 1000
 
     def start_breeding(self):
         self.create_new_population()
         population = []
+        print('\nGENERATION: ', self.generation)
 
         for game in self.games:
-            # play the game using this neural net and record the fitness function
+            # set the game up to play using the new paddles and ball
             game.paddle1.ball = game.ball
             game.paddle2.ball = game.ball
+            game.speed = self.cur_speed
 
+            # play the game and record the game speed multiplier to use for future games
             game.start_game()
+            self.cur_speed = game.speed
+
+            # append the neural net to the population
             population.append(game.paddle1)
             print(game.paddle1)
 
+        # sort the population best -> worst
         population = sorted(population, key=lambda x: x.fitness)
         for individual in population:
             print(individual)
 
         return population
 
-    def create_new_population(self, starting_network=None):
+    def create_new_population(self):
         population = []
         temp_population_size = self.population_size
-        if starting_network:
-            population.extend(starting_network)
-            temp_population_size -= 1
 
+        # create new games and neural net paddles equal to the population size
         for ndx in range(temp_population_size):
             ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
             game = PongGame()
@@ -66,19 +73,36 @@ class NeuralNetBreeder:
 
     # sort the genomes and cross them over with all other genomes
     def crossover(self, parent1, parent2):
+        # if the parents fitness is 0, they get eaten by pong-eaters so new parents take their place
+        if parent1.fitness == 0:
+            parent1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
+            parent1.set_colors()
+        if parent2.fitness == 0:
+            parent2 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
+            parent2.set_colors()
+
+        # use the parent as a skeleton to create the offspring, like adam and eve or something
         offspring = copy.deepcopy(parent1)
         offspring.fitness = 0
         offspring.generation = self.generation
-        # print(offspring.net.synapses)
 
+        # if one parent is significantly more fit than the other, their genes have a higher chance of propagating
+        # else if both parent's fitness are equal, the odds of crossover are equal for each of the parents
+        if parent1.fitness > parent2.fitness:
+            fit = (1/3)
+        elif parent2.fitness > parent1.fitness:
+            fit = (2/3)
+        else:
+            fit = 0.5
+
+        # perform crossover for each layer and synapse
         for layer in range(len(offspring.net.synapses)):
             for synapse in range(len(offspring.net.synapses[layer])):
-                if random.uniform(0, parent1.fitness + parent2.fitness) > parent2.fitness:
-                    # print('parent1')
+                if random.uniform(0, 1) > fit:
                     offspring.net.synapses[layer][synapse].weight = parent1.net.synapses[layer][synapse].weight
                 else:
-                    # print('parent2')
                     offspring.net.synapses[layer][synapse].weight = parent2.net.synapses[layer][synapse].weight
+            # crossover the parent's colors as well
             offspring.colors = [parent1.colors[0], parent2.colors[1], parent1.colors[2], parent2.colors[3]]
             print()
         f_name = random.choice(parent1.name.split())
@@ -87,29 +111,40 @@ class NeuralNetBreeder:
 
         return offspring
 
-    def randomize(self):
-        pass
-
     def mutate(self):
         pass
 
     def evolve(self, pop):
+        # iterate the generation count
         self.generation += 1
         population = list(sorted(pop, key=lambda x: x.fitness))
-        print('GENERATION: ', self.generation)
+        top = []
+        # take the top 25% of the previous population to live and
+        best = int(len(population) / 4)
+        if best > 0 and len(population) > 2:
+            top = population[:best]
+
+        print('\nGENERATION: ', self.generation)
         for p in population:
             print(p)
         children = []
+
         while len(population) > 1:
+            # take the top two parents from the population
             parent1 = population.pop()
             parent2 = population.pop()
+            # crossover the top two parents
             offspring = self.crossover(parent1, parent2)
             offspring.generation = self.generation
 
+            # start a new game with the offspring
             game = PongGame()
+            game.speed = self.cur_speed
             offspring.ball = game.ball
+            offspring.game = game
             game.paddle1 = offspring
             game.start_game()
+            self.cur_speed = game.speed
 
             print('parents: ', parent1, parent2)
             print(offspring)
@@ -117,7 +152,7 @@ class NeuralNetBreeder:
             children.append(offspring)
         if len(population) == 1:
             children.append(population[0])
-        return children
+        return children + top
 
 
 def main():

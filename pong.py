@@ -18,6 +18,7 @@ class PongGame:
         # self.paddle2 = NNPaddle(50, PongGame.window_height / 2, self.ball, self)
         self.winner = None
         self.game_over = False
+        self.speed = 1000
         self.scores = [0, 0]
 
     def start_game(self):
@@ -29,7 +30,7 @@ class PongGame:
 
         while not self.game_over:
 
-            delta = clock.tick(60) / 500
+            delta = clock.tick(60) / self.speed
             display.fill((255, 255, 255))
 
             # listen for events
@@ -38,12 +39,13 @@ class PongGame:
                     sys.exit()
 
             self.handle_input(delta)
-            self.handle_collisions()
+            self.game_over = self.handle_offscreen()
+            if not self.game_over:
+                self.handle_collisions()
             # super super advanced AI
             self.paddle1.follow_ball(delta)
             self.paddle2.follow_ball(delta)
             self.ball.move(delta)
-            self.game_over = self.handle_offscreen()
 
             self.draw(display)
             pygame.display.flip()
@@ -65,8 +67,15 @@ class PongGame:
             self.paddle1.move_up(delta)
         if keys[pygame.K_DOWN] and self.paddle1.bounds.y + self.paddle1.bounds.height < PongGame.window_height:
             self.paddle1.move_down(delta)
+        if keys[pygame.K_RIGHT]:
+            if self.speed < 1000000:
+                self.speed += 10
+        if keys[pygame.K_LEFT]:
+            if self.speed > 10:
+                self.speed -= 10
         if keys[pygame.K_r]:
             self.reset()
+
 
     def handle_collisions(self):
         # collision with human paddle
@@ -108,7 +117,6 @@ class PongGame:
         self.paddle2.reset(50, PongGame.window_height / 2, self.ball)
         self.paddle2.score = 0
         self.scores = [0, 0]
-
 
 
 def main():
