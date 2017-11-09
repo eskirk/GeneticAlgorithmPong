@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 /genomes
+/doyle
 
 # C extensions
 *.so

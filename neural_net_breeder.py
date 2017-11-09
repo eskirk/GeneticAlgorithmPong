@@ -18,7 +18,6 @@ class NeuralNetBreeder:
     def start_breeding(self):
         self.create_new_population()
         population = []
-        print('\nGENERATION: ', self.generation)
 
         for game in self.games:
             # set the game up to play using the new paddles and ball
@@ -32,12 +31,9 @@ class NeuralNetBreeder:
 
             # append the neural net to the population
             population.append(game.paddle1)
-            print(game.paddle1)
 
         # sort the population best -> worst
         population = sorted(population, key=lambda x: x.fitness)
-        for individual in population:
-            print(individual)
 
         return population
 
@@ -122,7 +118,7 @@ class NeuralNetBreeder:
         # take the top 25% of the previous population to live and
         best = int(len(population) / 4)
         if best > 0 and len(population) > 2:
-            top = population[:best]
+            top = population[-best:]
 
         print('\nGENERATION: ', self.generation)
         for p in population:
@@ -130,12 +126,16 @@ class NeuralNetBreeder:
         children = []
 
         while len(population) > 1:
-            # take the top two parents from the population
-            parent1 = population.pop()
-            parent2 = population.pop()
-            # crossover the top two parents
-            offspring = self.crossover(parent1, parent2)
-            offspring.generation = self.generation
+            if len(top) == 0:
+                # take the top two parents from the population
+                parent1 = population.pop()
+                parent2 = population.pop()
+                # crossover the top two parents
+                offspring = self.crossover(parent1, parent2)
+                offspring.generation = self.generation
+                print('parents: ', parent1, parent2)
+            else:
+                offspring = top.pop()
 
             # start a new game with the offspring
             game = PongGame()
@@ -146,13 +146,12 @@ class NeuralNetBreeder:
             game.start_game()
             self.cur_speed = game.speed
 
-            print('parents: ', parent1, parent2)
             print(offspring)
             offspring.save_genome()
             children.append(offspring)
         if len(population) == 1:
             children.append(population[0])
-        return children + top
+        return children
 
 
 def main():
