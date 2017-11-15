@@ -16,7 +16,7 @@ class NeuralNetBreeder:
         self.cur_speed = 1000
 
     def start_breeding(self):
-        self.create_new_population()
+        self.create_new_population(self.population_size)
         population = []
 
         for game in self.games:
@@ -37,9 +37,12 @@ class NeuralNetBreeder:
 
         return population
 
-    def create_new_population(self):
-        population = []
-        temp_population_size = self.population_size
+    def create_new_population(self, cur_pop_size=0):
+        if cur_pop_size > 0:
+            population = self.population
+        else:
+            population = []
+        temp_population_size = self.population_size - cur_pop_size
 
         # create new games and neural net paddles equal to the population size
         for ndx in range(temp_population_size):
@@ -69,14 +72,6 @@ class NeuralNetBreeder:
 
     # sort the genomes and cross them over with all other genomes
     def crossover(self, parent1, parent2):
-        # if the parents fitness is 0, they get eaten by pong-eaters so new parents take their place
-        if parent1.fitness == 0:
-            parent1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
-            parent1.set_colors()
-        if parent2.fitness == 0:
-            parent2 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
-            parent2.set_colors()
-
         # use the parent as a skeleton to create the offspring, like adam and eve or something
         offspring = copy.deepcopy(parent1)
         offspring.fitness = 0
@@ -114,41 +109,43 @@ class NeuralNetBreeder:
         # iterate the generation count
         self.generation += 1
         population = list(sorted(pop, key=lambda x: x.fitness))
-        top = []
-        # take the top 25% of the previous population to live and
-        best = int(len(population) / 4)
-        if best > 0 and len(population) > 2:
-            top = population[-best:]
 
         print('\nGENERATION: ', self.generation)
         for p in population:
-            print(p)
+            if p.fitness > 0:
+                print(p)
+            else:
+                population.remove(p)
         children = []
 
-        while len(population) > 1:
-            if len(top) == 0:
-                # take the top two parents from the population
-                parent1 = population.pop()
-                parent2 = population.pop()
-                # crossover the top two parents
-                offspring = self.crossover(parent1, parent2)
-                offspring.generation = self.generation
-                print('parents: ', parent1, parent2)
-            else:
-                offspring = top.pop()
+        if len(population) > 1:
+            while len(population) > 1:
+                if len(top) == 0:
+                    # take the top two parents from the population
+                    parent1 = population.pop()
+                    parent2 = population.pop()
+                    # crossover the top two parents
+                    offspring = self.crossover(parent1, parent2)
+                    offspring.generation = self.generation
+                    print('parents: ', parent1, parent2)
+                else:
+                    offspring = top.pop()
 
-            # start a new game with the offspring
-            game = PongGame()
-            game.speed = self.cur_speed
-            offspring.ball = game.ball
-            offspring.game = game
-            game.paddle1 = offspring
-            game.start_game()
-            self.cur_speed = game.speed
+                # start a new game with the offspring
+                game = PongGame()
+                game.speed = self.cur_speed
+                offspring.ball = game.ball
+                offspring.game = game
+                game.paddle1 = offspring
+                game.start_game()
+                self.cur_speed = game.speed
 
-            print(offspring)
-            offspring.save_genome()
-            children.append(offspring)
+                print(offspring)
+                offspring.save_genome()
+                children.append(offspring)
+        else:
+            while len(population) < self.population_size:
+                population.append()
         if len(population) == 1:
             children.append(population[0])
         return children
@@ -159,7 +156,7 @@ def main():
         breeder = NeuralNetBreeder(int(sys.argv[1]))
     else:
         breeder = NeuralNetBreeder(10)
-    population = breeder.start_breeding()
+    self.population = breeder.start_breeding()
 
     while len(population) > 1:
         population = breeder.evolve(population)
