@@ -7,13 +7,14 @@ import random
 
 
 class NeuralNetBreeder:
-    def __init__(self, population_size=10):
+    def __init__(self, population_size=10, strict_breeding=False):
         self.population = []
         self.games = []
         self.generation = 0
         self.best = []
         self.population_size = population_size
         self.cur_speed = 1000
+        self.strict_breeding = strict_breeding
 
     def start_breeding(self):
         self.create_new_population()
@@ -168,6 +169,7 @@ if __name__ == '__main__':
     parser.add_argument('-g', type=int, default=5)
     parser.add_argument('-p', type=int, default=10)
     parser.add_argument('-load', type=str, default=None)
+    parser.add_argument('-strict', type=bool, default=False)
     args = parser.parse_args()
 
     if args.g <= 0:
@@ -180,6 +182,9 @@ if __name__ == '__main__':
         raise argparse.ArgumentTypeError("Must supply a name of a past individual")
     else:
         print('Loading genome of ', args.load)
+
+    if args.strict is not False and not isinstance(args.strict, bool):
+        raise argparse.ArgumentTypeError("Must provide a boolean for strict breeding")
 
     main(args)
 

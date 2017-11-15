@@ -23,11 +23,13 @@ class Ball:
         if self.bounds.x <= paddle2.bounds.x + paddle2.bounds.width \
                 and paddle2.bounds.y <= self.bounds.y <= paddle2.bounds.y + paddle2.bounds.height\
                 and self.last_hit != paddle2:
+            paddle2.fitness += 1
             self.last_hit = paddle2
             return True
         elif self.bounds.x + self.bounds.width >= paddle1.bounds.x \
                 and paddle1.bounds.y <= self.bounds.y <= paddle1.bounds.y + paddle1.bounds.height\
                 and self.last_hit != paddle1:
+            paddle1.fitness += 1
             self.last_hit = paddle1
             return True
         return False
