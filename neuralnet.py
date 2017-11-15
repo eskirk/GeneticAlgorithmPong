@@ -116,6 +116,7 @@ class NNPaddle:
         self.color_ndx = 0
         self.seizure_reduction = 0
         self.seize_rate = random.uniform(0, 15)
+        self.set_colors()
 
     def __repr__(self):
         return str(self.name) + ' fitness: ' + str(self.fitness) + ' gen: ' + str(self.generation)
@@ -188,7 +189,7 @@ class NNPaddle:
                  'Don Cheedle', 'Don', 'Cheedle', 'Stanley', 'Alexa', 'The Pacer Test', 'Finn', 'Daniel', 'Dan the Man',
                  'Dad', 'The Alamo', 'Grobgobbler', 'Gavin', 'Doyle', '@RealGavin', 'Juul', 'Bruul', 'Dr.', 'Bichael',
                  'Flats', 'Andrew', 'Farquaad', 'Blanch', 'Son of', 'Dreyfuss', 'Chad', 'Donald', 'Chump', 'Too Many',
-                 'Bocephus', 'Diengklurg', 'Antwaun', 'Dart']
+                 'Bocephus', 'Diengklurg', 'Antwaun', 'Dart', 'Joe']
         if random.uniform(0, 1) > 0.5:
             return random.choice(names)
         else:

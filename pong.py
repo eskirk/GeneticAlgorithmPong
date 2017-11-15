@@ -68,11 +68,11 @@ class PongGame:
         if keys[pygame.K_DOWN] and self.paddle1.bounds.y + self.paddle1.bounds.height < PongGame.window_height:
             self.paddle1.move_down(delta)
         if keys[pygame.K_RIGHT]:
-            if self.speed < 1000000:
-                self.speed += 10
-        if keys[pygame.K_LEFT]:
             if self.speed > 10:
                 self.speed -= 10
+        if keys[pygame.K_LEFT]:
+            if self.speed < 1000000:
+                self.speed += 10
         if keys[pygame.K_r]:
             self.reset()
 
@@ -98,11 +98,11 @@ class PongGame:
         if self.ball.bounds.x + self.ball.bounds.width > PongGame.window_width or self.ball.bounds.x <= 0:
             if self.ball.bounds.x <= 0:
                 self.paddle1.score += 1
-                self.paddle1.fitness += 3
+                self.paddle1.fitness += 1
                 self.scores[0] += 1
             else:
                 self.paddle2.score += 1
-                self.paddle2.fitness += 3
+                self.paddle2.fitness += 1
                 self.scores[1] += 1
             self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
             self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)

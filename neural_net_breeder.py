@@ -7,7 +7,7 @@ import random
 
 
 class NeuralNetBreeder:
-    def __init__(self, population_size):
+    def __init__(self, population_size=10):
         self.population = []
         self.games = []
         self.generation = 0
@@ -27,26 +27,23 @@ class NeuralNetBreeder:
 
             # play the game and record the game speed multiplier to use for future games
             game.start_game()
+            print(game.paddle1)
             self.cur_speed = game.speed
-
             # append the neural net to the population
             population.append(game.paddle1)
-
         # sort the population best -> worst
-        population = sorted(population, key=lambda x: x.fitness)
-
-        return population
+        return sorted(population, key=lambda x: x.fitness, reverse=True)
 
     def create_new_population(self):
-        population = []
+        print('\nCreating new population of size', self.population_size)
+        self.generation = 0
         temp_population_size = self.population_size
+        population = []
 
         # create new games and neural net paddles equal to the population size
         for ndx in range(temp_population_size):
-            ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
             game = PongGame()
-            game.ball = ball
-            ai_1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, ball, game)
+            ai_1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, game.ball, game)
             ai_1.generation = self.generation
             # ai_2 = NNPaddle(50, PongGame.window_height / 2, ball, game)
             game.paddle1 = ai_1
@@ -68,41 +65,30 @@ class NeuralNetBreeder:
         pass
 
     # sort the genomes and cross them over with all other genomes
-    def crossover(self, parent1, parent2):
-        # if the parents fitness is 0, they get eaten by pong-eaters so new parents take their place
-        if parent1.fitness == 0:
-            parent1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
-            parent1.set_colors()
-        if parent2.fitness == 0:
-            parent2 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
-            parent2.set_colors()
-
+    def crossover(self, parent):
         # use the parent as a skeleton to create the offspring, like adam and eve or something
-        offspring = copy.deepcopy(parent1)
-        offspring.fitness = 0
-        offspring.generation = self.generation
+        game = PongGame()
+        offspring = copy.deepcopy(parent)
+        offspring.game = game
+        offspring.ball = game.ball
+        game.paddle1 = offspring
+        self.games.append(game)
 
-        # if one parent is significantly more fit than the other, their genes have a higher chance of propagating
-        # else if both parent's fitness are equal, the odds of crossover are equal for each of the parents
-        if parent1.fitness > parent2.fitness:
-            fit = (1/3)
-        elif parent2.fitness > parent1.fitness:
-            fit = (2/3)
-        else:
-            fit = 0.5
+        mate = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, offspring.game.ball, offspring.game)
+        offspring.fitness = 0
+        offspring.generation = parent.generation + 1
 
         # perform crossover for each layer and synapse
         for layer in range(len(offspring.net.synapses)):
             for synapse in range(len(offspring.net.synapses[layer])):
-                if random.uniform(0, 1) > fit:
-                    offspring.net.synapses[layer][synapse].weight = parent1.net.synapses[layer][synapse].weight
+                if random.uniform(0, 1) > (1/3):
+                    offspring.net.synapses[layer][synapse].weight = parent.net.synapses[layer][synapse].weight
                 else:
-                    offspring.net.synapses[layer][synapse].weight = parent2.net.synapses[layer][synapse].weight
+                    offspring.net.synapses[layer][synapse].weight = mate.net.synapses[layer][synapse].weight
             # crossover the parent's colors as well
-            offspring.colors = [parent1.colors[0], parent2.colors[1], parent1.colors[2], parent2.colors[3]]
-            print()
-        f_name = random.choice(parent1.name.split())
-        l_name = random.choice(parent2.name.split())
+            offspring.colors = [parent.colors[0], mate.colors[1], parent.colors[2], mate.colors[3]]
+        f_name = random.choice(parent.name.split())
+        l_name = random.choice(mate.name.split())
         offspring.name = f_name + ' ' + l_name
 
         return offspring
@@ -110,63 +96,92 @@ class NeuralNetBreeder:
     def mutate(self):
         pass
 
-    def evolve(self, pop):
+    def play_games(self):
         # iterate the generation count
         self.generation += 1
-        population = list(sorted(pop, key=lambda x: x.fitness))
-        top = []
-        # take the top 25% of the previous population to live and
-        best = int(len(population) / 4)
-        if best > 0 and len(population) > 2:
-            top = population[-best:]
+        # if nobody survived the last generation, generate a new population
+        if len(self.population) == 0:
+            print('\nCreating new population')
+            self.games = []
+            self.generation = 0
+            while len(self.population) < self.population_size:
+                game = PongGame()
+                nn_paddle = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, game.ball, game)
+                nn_paddle.generation = self.generation
+                game.paddle1 = nn_paddle
+                # ai_2 = NNPaddle(50, PongGame.window_height / 2, ball, game)
+                self.population.append(nn_paddle)
+                self.games.append(game)
+            for game in self.games:
+                game.paddle2.ball = game.ball
+                game.speed = self.cur_speed
+                game.start_game()
+                print(game.paddle1)
+                self.cur_speed = game.speed
+        else:
+            print('\nGeneration', self.games[0].paddle1.generation)
+            for game in self.games:
+                game.paddle2.ball = game.ball
+                game.paddle2.score = 0
+                game.paddle1.score = 0
+                game.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, game.ball)
+                game.speed = self.cur_speed
+                game.start_game()
+                print(game.paddle1)
+                self.cur_speed = game.speed
+        # start breeding the newly evaluated genomes
+        return self.breed()
 
-        print('\nGENERATION: ', self.generation)
-        for p in population:
-            print(p)
-        children = []
+    def breed(self):
+        fit_individuals = []
+        for p in self.population:
+            if p.fitness > 1:
+                fit_individuals.append(p)
+        self.population = []
+        self.games = []
 
-        while len(population) > 1:
-            if len(top) == 0:
-                # take the top two parents from the population
-                parent1 = population.pop()
-                parent2 = population.pop()
-                # crossover the top two parents
-                offspring = self.crossover(parent1, parent2)
-                offspring.generation = self.generation
-                print('parents: ', parent1, parent2)
-            else:
-                offspring = top.pop()
-
-            # start a new game with the offspring
-            game = PongGame()
-            game.speed = self.cur_speed
-            offspring.ball = game.ball
-            offspring.game = game
-            game.paddle1 = offspring
-            game.start_game()
-            self.cur_speed = game.speed
-
-            print(offspring)
-            offspring.save_genome()
-            children.append(offspring)
-        if len(population) == 1:
-            children.append(population[0])
-        return children
+        if len(fit_individuals) >= 1:
+            fit_individuals = sorted(fit_individuals, key=lambda x: x.fitness, reverse=True)
+            fittest = fit_individuals[0]
+            while len(self.population) < self.population_size:
+                self.population.append(self.crossover(fittest))
+            return fittest
+        return None
 
 
-def main():
-    if len(sys.argv) > 1:
-        breeder = NeuralNetBreeder(int(sys.argv[1]))
-    else:
-        breeder = NeuralNetBreeder(10)
-    population = breeder.start_breeding()
+def main(args):
+    breeder = NeuralNetBreeder(args.p)
+    breeder.population = breeder.start_breeding()
 
-    while len(population) > 1:
-        population = breeder.evolve(population)
+    while breeder.generation < args.g:
+        # play the games and evolve if any of the genomes are successful
+        best = breeder.play_games()
+        if best is not None:
+            best.save_genome()
+            print('\nDaddy of generation', best.generation + 1, '-', best)
 
 
 if __name__ == '__main__':
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-g', type=int, default=5)
+    parser.add_argument('-p', type=int, default=10)
+    parser.add_argument('-load', type=str, default=None)
+    args = parser.parse_args()
+
+    if args.g <= 0:
+        raise argparse.ArgumentTypeError("Minimum generations is 1")
+
+    if args.g <= 0:
+        raise argparse.ArgumentTypeError("Minimum population size is 1")
+
+    if not isinstance(args.load, str):
+        raise argparse.ArgumentTypeError("Must supply a name of a past individual")
+    else:
+        print('Loading genome of ', args.load)
+
+    main(args)
 
 
 
