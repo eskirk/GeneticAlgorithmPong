@@ -176,7 +176,7 @@ if __name__ == '__main__':
     if args.g <= 0:
         raise argparse.ArgumentTypeError("Minimum population size is 1")
 
-    if not isinstance(args.load, str):
+    if args.load is not None and not isinstance(args.load, str):
         raise argparse.ArgumentTypeError("Must supply a name of a past individual")
     else:
         print('Loading genome of ', args.load)
