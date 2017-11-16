@@ -19,20 +19,27 @@ class Ball:
     def get_position(self):
         return self.bounds.x, self.bounds.y
 
-    def intersects_paddle(self, paddle2, paddle1):
-        if self.bounds.x <= paddle2.bounds.x + paddle2.bounds.width \
-                and paddle2.bounds.y <= self.bounds.y <= paddle2.bounds.y + paddle2.bounds.height\
-                and self.last_hit != paddle2:
-            paddle2.fitness += 1
-            self.last_hit = paddle2
-            return True
-        elif self.bounds.x + self.bounds.width >= paddle1.bounds.x \
+    def intersects_paddle(self, paddle1, paddle2):
+        if self.bounds.x <= paddle1.bounds.x + paddle1.bounds.width \
                 and paddle1.bounds.y <= self.bounds.y <= paddle1.bounds.y + paddle1.bounds.height\
-                and self.last_hit != paddle1:
-            paddle1.fitness += 1
+                and self.last_hit != paddle1\
+                and self.behind_paddle():
+            paddle1.contacts_ball += 1
             self.last_hit = paddle1
             return True
+        elif self.bounds.x + self.bounds.width >= paddle2.bounds.x \
+                and paddle2.bounds.y <= self.bounds.y <= paddle2.bounds.y + paddle2.bounds.height\
+                and self.last_hit != paddle2\
+                and self.behind_paddle():
+            paddle2.contacts_ball += 1
+            self.last_hit = paddle2
+            return True
         return False
+
+    def behind_paddle(self):
+        if self.get_position()[0] < 40 or self.get_position()[0] > 460:
+            return False
+        return True
 
     def reset(self):
         from pong import PongGame

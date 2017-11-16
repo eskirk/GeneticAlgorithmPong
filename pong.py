@@ -1,9 +1,9 @@
 import sys
 import pygame
-
 from ball import Ball
 from neuralnet import AIPaddle
 from neuralnet import NNPaddle
+from paddle import Paddle
 
 
 class PongGame:
@@ -12,14 +12,15 @@ class PongGame:
 
     def __init__(self):
         self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
-        # self.paddle1 = Paddle(PongGame.window_width - 50, PongGame.window_height / 2)
         self.paddle1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, self.ball, self)
         self.paddle2 = AIPaddle(50, PongGame.window_height / 2, self.ball, self)
-        # self.paddle2 = NNPaddle(50, PongGame.window_height / 2, self.ball, self)
+
         self.winner = None
         self.game_over = False
         self.speed = 1000
         self.scores = [0, 0]
+        self.timeout = 0
+        self.pause = False
 
     def start_game(self):
         pygame.init()
@@ -48,6 +49,10 @@ class PongGame:
             self.ball.move(delta)
 
             self.draw(display)
+            if self.timeout < 100:
+                self.timeout += 1
+            if self.pause:
+                self.reset()
             pygame.display.flip()
 
     def draw(self, display):
@@ -63,10 +68,10 @@ class PongGame:
     def handle_input(self, delta):
         # listen for key presses
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP] and self.paddle1.bounds.y > 0:
-            self.paddle1.move_up(delta)
-        if keys[pygame.K_DOWN] and self.paddle1.bounds.y + self.paddle1.bounds.height < PongGame.window_height:
-            self.paddle1.move_down(delta)
+        if keys[pygame.K_UP] and self.paddle2.bounds.y > 0:
+            self.paddle2.move_up(delta)
+        if keys[pygame.K_DOWN] and self.paddle2.bounds.y + self.paddle2.bounds.height < PongGame.window_height:
+            self.paddle2.move_down(delta)
         if keys[pygame.K_RIGHT]:
             if self.speed > 10:
                 self.speed -= 10
@@ -75,7 +80,17 @@ class PongGame:
                 self.speed += 10
         if keys[pygame.K_r]:
             self.reset()
-
+        if keys[pygame.K_SPACE] and self.timeout == 100:
+            self.timeout = 0
+            if self.paddle2.name == 'AIPaddle':
+                self.paddle2 = Paddle(50, PongGame.window_height / 2)
+            else:
+                self.paddle2 = AIPaddle(50, self.paddle2.bounds.x + self.paddle2.bounds.height, self.ball, self)
+        if keys[pygame.K_p] and self.timeout == 100:
+            if not self.pause:
+                self.pause = True
+            else:
+                self.pause = False
 
     def handle_collisions(self):
         # collision with human paddle

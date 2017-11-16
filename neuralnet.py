@@ -77,6 +77,7 @@ class AIPaddle:
         self.game = game
         self.score = 0
         self.fitness = 0
+        self.contacts_ball = 0
         self.name = 'AIPaddle'
 
     def draw(self, display):
@@ -110,6 +111,7 @@ class NNPaddle:
         self.generation = 0
         self.score = 0
         self.fitness = 0
+        self.contacts_ball = 0
         self.name = self.random_name()
 
         self.colors = None

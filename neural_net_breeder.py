@@ -1,7 +1,5 @@
 from neuralnet import NeuralNet, AIPaddle, NNPaddle
 from pong import PongGame
-from ball import Ball
-import sys
 import copy
 import random
 
@@ -78,29 +76,32 @@ class NeuralNetBreeder:
         pass
 
     # sort the genomes and cross them over with all other genomes
-    def crossover(self, parent):
+    def crossover(self, parent1, parent2=None):
         # use the parent as a skeleton to create the offspring, like adam and eve or something
         game = PongGame()
-        offspring = copy.deepcopy(parent)
+        offspring = copy.deepcopy(parent1)
         offspring.game = game
         offspring.ball = game.ball
         game.paddle1 = offspring
         self.games.append(game)
 
-        mate = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, offspring.game.ball, offspring.game)
+        if parent2 is None:
+            mate = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, offspring.game.ball, offspring.game)
+        else:
+            mate = parent2
         offspring.fitness = 0
-        offspring.generation = parent.generation + 1
+        offspring.generation = parent1.generation + 1
 
         # perform crossover for each layer and synapse
         for layer in range(len(offspring.net.synapses)):
             for synapse in range(len(offspring.net.synapses[layer])):
                 if random.uniform(0, 1) > (1/3):
-                    offspring.net.synapses[layer][synapse].weight = parent.net.synapses[layer][synapse].weight
+                    offspring.net.synapses[layer][synapse].weight = parent1.net.synapses[layer][synapse].weight
                 else:
                     offspring.net.synapses[layer][synapse].weight = mate.net.synapses[layer][synapse].weight
             # crossover the parent's colors as well
-            offspring.colors = [parent.colors[0], mate.colors[1], parent.colors[2], mate.colors[3]]
-        f_name = random.choice(parent.name.split())
+            offspring.colors = [parent1.colors[0], mate.colors[1], parent1.colors[2], mate.colors[3]]
+        f_name = random.choice(parent1.name.split())
         l_name = random.choice(mate.name.split())
         offspring.name = f_name + ' ' + l_name
 
@@ -148,16 +149,27 @@ class NeuralNetBreeder:
     def breed(self):
         fit_individuals = []
         for p in self.population:
-            if p.fitness > 1:
-                fit_individuals.append(p)
+            if self.strict_breeding:
+                if p.fitness > 1:
+                    fit_individuals.append(p)
+            else:
+                p.fitness += p.contacts_ball
+                if p.fitness > 1:
+                    fit_individuals.append(p)
         self.population = []
         self.games = []
 
         if len(fit_individuals) >= 1:
             fit_individuals = sorted(fit_individuals, key=lambda x: x.fitness, reverse=True)
             fittest = fit_individuals[0]
-            while len(self.population) < self.population_size:
-                self.population.append(self.crossover(fittest))
+            if len(fit_individuals) == 1:
+                while len(self.population) < self.population_size:
+                    self.population.append(self.crossover(fittest))
+            else:
+                second_fittest = fit_individuals[1]
+                fittest = self.crossover(fittest, second_fittest)
+                while len(self.population) < self.population_size:
+                    self.population.append(self.crossover(fittest))
             return fittest
         return None
 
