@@ -18,3 +18,7 @@ class Synapse:
 
     def randomize(self):
         self.weight = random.uniform(-1, 1)
+
+    def set_weight(self, weight):
+        self.weight = weight
+

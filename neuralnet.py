@@ -175,13 +175,39 @@ class NNPaddle:
             f.write(str(synapse) + '\n')
         f.write(self.name + '\n')
         f.write(str(self.generation) + '\n')
-        f.write(str(self.colors))
         f.close()
 
     def load_genomes(self, file):
-        f = open(file)
+        f = open('./genomes/' + file)
+        layer_number = 0
+        synapses = []
+        name, gen = False, False
 
-        # for line in f:
+        for line in f:
+            if len(line) > 0 and line[0] == '[' and layer_number <= self.net.num_hidden_layers:
+                gene = []
+                synapse = line.split(',')
+                for s in synapse:
+                    if '[' in s:
+                        gene.append(float(s.strip('[')))
+                    elif '\n' in s:
+                        gene.append(float(s.strip(']\n')))
+                    else:
+                        gene.append(float(s))
+                synapses.append(gene)
+                layer_number += 1
+            elif not name:
+                self.name = line.strip('\n')
+                name = True
+            elif not gen:
+                self.generation = int(line.strip('\n'))
+                gen = True
+
+        for i in range(len(self.net.synapses)):
+            for j in range(len(self.net.synapses[i])):
+                self.net.synapses[i][j].weight = synapses[i][j]
+
+        print('Loaded genome:', self)
 
     @staticmethod
     def random_name():
