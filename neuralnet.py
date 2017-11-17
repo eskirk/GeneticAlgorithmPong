@@ -107,12 +107,14 @@ class NNPaddle:
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
         self.ball = ball
         self.game = game
-        self.net = NeuralNet(4, 1, 3)
+        # self.net = NeuralNet(4, 1, 3)
+        self.net = NeuralNet(3, 1, 3)
         self.generation = 0
         self.score = 0
         self.fitness = 0
         self.contacts_ball = 0
         self.name = self.random_name()
+        self.parents = []
 
         self.colors = None
         self.color_ndx = 0
@@ -121,7 +123,8 @@ class NNPaddle:
         self.set_colors()
 
     def __repr__(self):
-        return str(self.name) + ' fitness: ' + str(self.fitness) + ' gen: ' + str(self.generation)
+        return str(self.name) + ' score: ' + str(int(self.fitness/10)) + ' contacts: ' + str(self.contacts_ball) + \
+               ' gen: ' + str(self.generation)
 
     def draw(self, display):
         random.seed()
@@ -152,11 +155,10 @@ class NNPaddle:
     def follow_ball(self, delta):
         y_pos = self.bounds.y + self.bounds.height
         ball_y = self.ball.bounds.y
-        ball_vel_x = self.ball.vel_x
-        ball_vel_y = self.ball.vel_y
-        inputs = [y_pos, ball_y, ball_vel_x, ball_vel_y]
+        ball_speed = math.sqrt(self.ball.vel_x**2 + self.ball.vel_y**2)
+        inputs = [y_pos, ball_y, ball_speed]
+        # inputs = [y_pos, ball_y, self.ball.vel_x, self.ball.vel_y]
 
-        # print(inputs, ' inputs')
         output = self.net.get_output(inputs)
         if output > 0.5:
             if self.bounds.y + self.bounds.height < self.game.window_height:
@@ -169,8 +171,8 @@ class NNPaddle:
         self.ball = ball
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
 
-    def save_genome(self):
-        path = './genomes/' + str(self.name)
+    def save_genome(self, file_path='./genomes/'):
+        path = file_path + str(self.name)
         f = open(path, 'w+')
 
         for synapse in self.net.synapses:
@@ -217,7 +219,7 @@ class NNPaddle:
                  'Don Cheedle', 'Don', 'Cheedle', 'Stanley', 'Alexa', 'The Pacer Test', 'Finn', 'Daniel', 'Dan the Man',
                  'Dad', 'The Alamo', 'Grobgobbler', 'Gavin', 'Doyle', '@RealGavin', 'Juul', 'Bruul', 'Dr.', 'Bichael',
                  'Flats', 'Andrew', 'Farquaad', 'Blanch', 'Son of', 'Dreyfuss', 'Chad', 'Donald', 'Chump', 'Too Many',
-                 'Bocephus', 'Diengklurg', 'Antwaun', 'Dart', 'Joe']
+                 'Bocephus', 'Diengklurg', 'Antwaun', 'Dart', 'Joe', 'Szymczyk']
         if random.uniform(0, 1) > 0.5:
             return random.choice(names)
         else:
@@ -229,8 +231,8 @@ class NNPaddle:
 
 
 if __name__ == '__main__':
-    net = NeuralNet(4, 1, 3)
-    inps = [0, 0, 0, 0]
+    net = NeuralNet(3, 1, 3)
+    inps = [0, 0, 0]
     print('Inputs: ', inps)
     print('Output:', net.get_output(inps))
 

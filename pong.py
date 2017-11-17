@@ -14,6 +14,7 @@ class PongGame:
         self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
         self.paddle1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, self.ball, self)
         self.paddle2 = AIPaddle(50, PongGame.window_height / 2, self.ball, self)
+        self.temp_paddle = None
 
         self.winner = None
         self.game_over = False
@@ -82,10 +83,12 @@ class PongGame:
             self.reset()
         if keys[pygame.K_SPACE] and self.timeout == 100:
             self.timeout = 0
-            if self.paddle2.name == 'AIPaddle':
+            if self.paddle2.name != 'Player':
+                self.temp_paddle = self.paddle2
                 self.paddle2 = Paddle(50, PongGame.window_height / 2)
+                self.paddle2.score = self.scores[0]
             else:
-                self.paddle2 = AIPaddle(50, self.paddle2.bounds.x + self.paddle2.bounds.height, self.ball, self)
+                self.paddle2 = self.temp_paddle
         if keys[pygame.K_p] and self.timeout == 100:
             if not self.pause:
                 self.pause = True
@@ -128,6 +131,7 @@ class PongGame:
         self.ball.reset()
         self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)
         self.paddle1.fitness = 0
+        self.paddle1.contacts_ball = 0
         self.paddle1.score = 0
         self.paddle2.reset(50, PongGame.window_height / 2, self.ball)
         self.paddle2.score = 0

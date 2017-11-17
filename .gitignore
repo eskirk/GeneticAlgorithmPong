@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 /genomes
-/doyle
+/final_genomes
 
 # C extensions
 *.so
