@@ -57,8 +57,8 @@ class NeuralNetBreeder:
 
         # begin creating generations while the generation count is under the desired limit
         while self.generation <= self.max_generation:
-            # if the generation is successful/fit, start training eachother
-            if self.generation >= 2:
+            # if the generation is sustainabale/fit, start training eachother
+            if self.generation >= 3:
                 self.train_eachother = True
 
             # play the games and evolve if any of the genomes are successful
