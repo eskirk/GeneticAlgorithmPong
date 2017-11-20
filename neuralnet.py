@@ -1,17 +1,18 @@
-import pygame
 import math
 import random
+import pygame
 
 from neuron import Neuron
 from synapse import Synapse
 
 
-class NeuralNet:
+class NeuralNet(object):
     def __init__(self, num_inputs, num_hidden_layers, num_neurons):
         self.fitness = None
         self.output = Neuron()
         self.inputs = [Neuron() for _ in range(num_inputs)]
-        self.hidden_layers = [[Neuron() for _ in range(num_neurons)] for _ in range(num_hidden_layers)]
+        self.hidden_layers = [[Neuron() for _ in range(num_neurons)]
+                              for _ in range(num_hidden_layers)]
         self.synapses = [[] for _ in range(num_hidden_layers + 1)]
         self.num_hidden_layers = num_hidden_layers
         self.init_synapses()
@@ -27,11 +28,13 @@ class NeuralNet:
             for curr_ndx in range(len(self.hidden_layers) - 1):
                 for neuron in self.hidden_layers[curr_ndx]:
                     for next_neuron in self.hidden_layers[curr_ndx + 1]:
-                        self.synapses[curr_ndx + 1].append(Synapse(neuron, next_neuron))
+                        self.synapses[curr_ndx +
+                                      1].append(Synapse(neuron, next_neuron))
 
         # link last layer to output
         for neuron in self.hidden_layers[len(self.hidden_layers) - 1]:
-            self.synapses[len(self.synapses) - 1].append(Synapse(neuron, self.output))
+            self.synapses[len(self.synapses) -
+                          1].append(Synapse(neuron, self.output))
 
     def get_output(self, inputs):
         # set the value of the input neurons to the input values passed in
@@ -41,14 +44,16 @@ class NeuralNet:
         # go through each of the synapses and add the values to the next layer of neurons
         for i in range(self.num_hidden_layers):
             for synapse in self.synapses[i]:
-                synapse.end_neuron.add_value(synapse.weight * synapse.start_neuron.get_value())
+                synapse.end_neuron.add_value(
+                    synapse.weight * synapse.start_neuron.get_value())
             # once all the values have been added together, apply the sigmoid to the final value of the neuron
             for neuron in self.hidden_layers[i]:
                 neuron.set_value(NeuralNet.sigmoid(neuron.get_value()))
 
         # generate the final value by adding all the final layers values together
         for synapse in self.synapses[self.num_hidden_layers]:
-            synapse.end_neuron.add_value(synapse.weight * synapse.start_neuron.get_value())
+            synapse.end_neuron.add_value(
+                synapse.weight * synapse.start_neuron.get_value())
 
         # apply the sigmoid function to the final neuron's value
         self.output.set_value(NeuralNet.sigmoid(self.output.get_value()))
@@ -70,7 +75,7 @@ class NeuralNet:
             return 1 / (1 + math.exp(x))
 
 
-class AIPaddle:
+class AIPaddle(object):
     def __init__(self, x_pos, y_pos, ball, game):
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
         self.ball = ball
@@ -93,16 +98,15 @@ class AIPaddle:
         if (self.ball.bounds.y + self.ball.bounds.width) > (self.bounds.y + self.bounds.height):
             if self.bounds.y + self.bounds.height < self.game.window_height:
                 self.move_down(delta)
-        elif (self.ball.bounds.y + self.ball.bounds.width) < (self.bounds.y + self.bounds.height):
-            if self.bounds.y > 0:
-                self.move_up(delta)
+        elif (self.ball.bounds.y + self.ball.bounds.width) < (self.bounds.y + self.bounds.height) and self.bounds.y > 0:
+            self.move_up(delta)
 
     def reset(self, x_pos, y_pos, ball):
         self.ball = ball
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
 
 
-class NNPaddle:
+class NNPaddle(object):
     def __init__(self, x_pos, y_pos, ball, game):
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
         self.ball = ball
@@ -123,8 +127,8 @@ class NNPaddle:
         self.set_colors()
 
     def __repr__(self):
-        return str(self.name) + ' score: ' + str(int(self.fitness/10)) + ' contacts: ' + str(self.contacts_ball) + \
-               ' gen: ' + str(self.generation)
+        return str(self.name) + ' score: ' + str(int(self.fitness / 10)) + ' contacts: ' + str(self.contacts_ball) + \
+            ' gen: ' + str(self.generation)
 
     def draw(self, display):
         random.seed()
@@ -138,10 +142,14 @@ class NNPaddle:
         pygame.draw.rect(display, (self.colors[self.color_ndx]), self.bounds)
 
     def set_colors(self):
-        color_1 = (random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
-        color_2 = (random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
-        color_3 = (random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
-        color_4 = (random.uniform(0, 255), random.uniform(0, 255), random.uniform(0, 255))
+        color_1 = (random.uniform(0, 255), random.uniform(
+            0, 255), random.uniform(0, 255))
+        color_2 = (random.uniform(0, 255), random.uniform(
+            0, 255), random.uniform(0, 255))
+        color_3 = (random.uniform(0, 255), random.uniform(
+            0, 255), random.uniform(0, 255))
+        color_4 = (random.uniform(0, 255), random.uniform(
+            0, 255), random.uniform(0, 255))
         self.colors = [color_1, color_2, color_3, color_4]
         self.color_ndx = 0
         self.color_ndx = int(random.uniform(0, 4))
@@ -235,5 +243,3 @@ if __name__ == '__main__':
     inps = [0, 0, 0]
     print('Inputs: ', inps)
     print('Output:', net.get_output(inps))
-
-

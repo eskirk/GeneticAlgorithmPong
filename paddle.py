@@ -1,6 +1,4 @@
 import pygame
-# from pong import PongGame
-
 
 class Paddle:
     def __init__(self, x_pos, y_pos):
@@ -19,7 +17,7 @@ class Paddle:
     def move_down(self, delta):
         self.bounds = self.bounds.move(0, 250 * delta)
 
-    def reset(self, x_pos, y_pos, ball):
+    def reset(self):
         from pong import PongGame
         self.bounds = pygame.Rect(50, PongGame.window_height / 2, 15, 100)
 

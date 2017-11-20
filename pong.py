@@ -41,7 +41,7 @@ class PongGame:
                     sys.exit()
 
             self.handle_input(delta)
-            self.game_over = self.handle_offscreen()
+            self.game_over = self.handle_off_screen()
             if not self.game_over:
                 self.handle_collisions()
             # super super advanced AI
@@ -73,11 +73,9 @@ class PongGame:
             self.paddle2.move_up(delta)
         if keys[pygame.K_DOWN] and self.paddle2.bounds.y + self.paddle2.bounds.height < PongGame.window_height:
             self.paddle2.move_down(delta)
-        if keys[pygame.K_RIGHT]:
-            if self.speed > 10:
+        if keys[pygame.K_RIGHT] and self.speed > 10:
                 self.speed -= 10
-        if keys[pygame.K_LEFT]:
-            if self.speed < 1000000:
+        if keys[pygame.K_LEFT] and self.speed < 1000000:
                 self.speed += 10
         if keys[pygame.K_r]:
             self.reset()
@@ -102,10 +100,10 @@ class PongGame:
             self.ball.vel_x *= 1.1
             self.ball.vel_y *= 1.1
         # collision with ceiling
-        elif (self.ball.bounds.y <= 0 and self.ball.vel_y < 0)or (self.ball.bounds.y + self.ball.bounds.height >= PongGame.window_height and self.ball.vel_y > 0):
+        elif (self.ball.bounds.y <= 0 and self.ball.vel_y < 0) or (self.ball.bounds.y + self.ball.bounds.height >= PongGame.window_height and self.ball.vel_y > 0):
             self.ball.vel_y = -self.ball.vel_y
 
-    def handle_offscreen(self):
+    def handle_off_screen(self):
         if self.paddle1.score >= 3:
             self.winner = self.paddle1
             return True

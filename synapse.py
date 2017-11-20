@@ -21,4 +21,3 @@ class Synapse:
 
     def set_weight(self, weight):
         self.weight = weight
-

@@ -2,9 +2,10 @@ from neuralnet import NeuralNet, AIPaddle, NNPaddle
 from pong import PongGame
 import copy
 import random
+import argparse
 
 
-class NeuralNetBreeder:
+class NeuralNetBreeder(object):
     def __init__(self, population_size=10, strict_breeding=False, max_generation=5):
         self.population = []
         self.games = []
@@ -14,7 +15,7 @@ class NeuralNetBreeder:
         self.population_size = population_size
         self.cur_speed = 1000
         self.strict_breeding = strict_breeding
-        self.train_eachother = False
+        self.train_each_other = False
 
     def __str__(self):
         return '\n=== Neural Net Breeder ===\nPopulation Size: ' + str(self.population_size) + '\nStrict Breeding: ' + \
@@ -57,17 +58,17 @@ class NeuralNetBreeder:
 
         # begin creating generations while the generation count is under the desired limit
         while self.generation <= self.max_generation:
-            # if the generation is sustainabale/fit, start training eachother
+            # if the generation is sustainable/fit, start training each other
             if self.generation >= 3:
-                self.train_eachother = True
+                self.train_each_other = True
 
             # play the games and evolve if any of the genomes are successful
-            if not self.train_eachother:
+            if not self.train_each_other:
                 self.play_games()
                 best = self.breed()
-            # if these genomes are already developed, play against eachother
+            # if these genomes are already developed, play against each other
             else:
-                self.play_games_against_eachother()
+                self.play_games_against_each_other()
                 best = self.breed()
 
             # if there was a fit genome, save their genome and build a generation off of them
@@ -79,7 +80,7 @@ class NeuralNetBreeder:
                 best[0].save_genome()
                 self.strict_breeding = True
             if best is None:
-                self.train_eachother = False
+                self.train_each_other = False
         # if we reach our desired generation, save the genomes in the ./final_genomes folder
         if self.generation >= self.max_generation:
             print('=== Simulation over ===\nResults:')
@@ -90,7 +91,7 @@ class NeuralNetBreeder:
     def create_new_population(self):
         print('\nCreating new population of size', self.population_size)
         self.generation = 0
-        self.train_eachother = False
+        self.train_each_other = False
         temp_population_size = self.population_size
         population = []
 
@@ -189,7 +190,7 @@ class NeuralNetBreeder:
                 print(game.paddle1)
                 self.cur_speed = game.speed
 
-    def play_games_against_eachother(self):
+    def play_games_against_each_other(self):
         print('\n=== Generation', self.generation, '===')
         for game in range(0, len(self.games), 2):
             self.games[game].paddle2 = self.games[game + 1].paddle1
@@ -254,9 +255,7 @@ def main(args):
     breeder.start_breeding(parent)
 
 
-if __name__ == '__main__':
-    import argparse
-
+def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-g', type=int, default=5)
     parser.add_argument('-p', type=int, default=10)
@@ -278,11 +277,8 @@ if __name__ == '__main__':
     if args.strict is not False and not isinstance(args.strict, bool):
         raise argparse.ArgumentTypeError("Must provide a boolean for strict breeding")
 
-    main(args)
+    return args
 
 
-
-
-
-
-
+if __name__ == '__main__':
+    main(parse_args())
