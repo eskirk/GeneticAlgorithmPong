@@ -130,6 +130,9 @@ class NNPaddle(object):
         return str(self.name) + ' score: ' + str(int(self.fitness / 10)) + ' contacts: ' + str(self.contacts_ball) + \
             ' gen: ' + str(self.generation)
 
+    def __gt__(self, other):
+        return self.fitness > other.fitness
+
     def draw(self, display):
         random.seed()
         if self.colors is None:
