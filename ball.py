@@ -37,7 +37,7 @@ class Ball:
         return False
 
     def behind_paddle(self):
-        if self.get_position()[0] < 40 or self.get_position()[0] > 460:
+        if self.get_position()[0] < 40 or self.get_position()[0] > 610:
             return False
         return True
 

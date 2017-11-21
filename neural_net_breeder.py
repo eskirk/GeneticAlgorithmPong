@@ -80,14 +80,16 @@ class NeuralNetBreeder(object):
                     print(genome)
                 best[0].save_genome()
                 self.strict_breeding = True
+                self.best = list(self.best)
             if best is None:
                 self.train_each_other = False
 
         # if we reach our desired generation, save the genomes in the ./final_genomes folder
-        print('=== Simulation over ===\nResults:')
-        for p in self.population:
-            print(p)
-            p.save_genome('./final_genomes/')
+        if self.generation >= self.max_generation:
+            print('=== Simulation over ===\nResults:')
+            for p in self.best:
+                print(p)
+                p.save_genome('./final_genomes/')
 
     def create_new_population(self):
         print('\nCreating new population of size', self.population_size)
@@ -194,6 +196,11 @@ class NeuralNetBreeder(object):
 
     def play_games_against_each_other(self):
         print('\n=== Generation', self.generation, '===')
+        # if the number of games is odd, remove the last game in the list
+        if len(self.games) % 2 != 0:
+            self.games.pop()
+
+        # loop through games two at a time moving the NNPaddle of the second game to the first game
         for game in range(0, len(self.games), 2):
             self.games[game].paddle2 = self.games[game + 1].paddle1
 
@@ -224,13 +231,10 @@ class NeuralNetBreeder(object):
         self.population = []
         self.games = []
 
-        if not fit_individuals:
-            return None
-
-        fit_individuals.sort(reverse=True)
-        print(fit_individuals)
-        fittest = fit_individuals[0]
-        print(fittest)
+        # if there are fit individuals, use them to create a new population
+        if len(fit_individuals) >= 1:
+            fit_individuals = sorted(fit_individuals, key=lambda x: x.fitness, reverse=True)
+            fittest = fit_individuals[0]
 
         if len(fit_individuals) == 1:
             while len(self.population) < self.population_size:
@@ -249,7 +253,17 @@ class NeuralNetBreeder(object):
                     temp_population.remove(fittest)
                     second_fittest = random.choice(temp_population)
                     self.population.append(self.crossover(fittest, second_fittest))
-        return fit_individuals
+
+                    while len(self.population) < self.population_size:
+                        temp_population = list(fit_individuals)
+                        fittest = random.choice(temp_population)
+                        temp_population.remove(fittest)
+                        second_fittest = random.choice(temp_population)
+
+                        self.population.append(self.crossover(fittest, second_fittest))
+            return fit_individuals
+        # if there are no fit individuals, return nothing
+        return None
 
 
 def main(args):
@@ -259,6 +273,7 @@ def main(args):
     if args.load is not None:
         parent = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
         parent.load_genomes(args.load)
+        breeder.strict_breeding = True
 
     breeder.init_breeder(parent)
     breeder.start_breeding()
