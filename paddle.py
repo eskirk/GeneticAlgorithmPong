@@ -1,5 +1,6 @@
 import pygame
 
+
 class Paddle:
     def __init__(self, x_pos, y_pos):
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
@@ -17,9 +18,8 @@ class Paddle:
     def move_down(self, delta):
         self.bounds = self.bounds.move(0, 250 * delta)
 
-    def reset(self):
-        from pong import PongGame
-        self.bounds = pygame.Rect(50, PongGame.window_height / 2, 15, 100)
+    def reset(self, x_pos, y_pos, ball):
+        self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
 
     def follow_ball(self, delta):
         pass

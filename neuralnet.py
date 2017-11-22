@@ -127,7 +127,7 @@ class NNPaddle(object):
         self.set_colors()
 
     def __repr__(self):
-        return str(self.name) + ' score: ' + str(int(self.fitness / 10)) + ' contacts: ' + str(self.contacts_ball) + \
+        return str(self.name) + ' score: ' + str(self.score) + ' contacts: ' + str(self.contacts_ball) + \
             ' gen: ' + str(self.generation)
 
     def __gt__(self, other):
@@ -230,7 +230,7 @@ class NNPaddle(object):
                  'Don Cheedle', 'Don', 'Cheedle', 'Stanley', 'Alexa', 'The Pacer Test', 'Finn', 'Daniel', 'Dan the Man',
                  'Dad', 'The Alamo', 'Grobgobbler', 'Gavin', 'Doyle', '@RealGavin', 'Juul', 'Bruul', 'Dr.', 'Bichael',
                  'Flats', 'Andrew', 'Farquaad', 'Blanch', 'Son of', 'Dreyfuss', 'Chad', 'Donald', 'Chump', 'Too Many',
-                 'Bocephus', 'Diengklurg', 'Antwaun', 'Dart', 'Joe', 'Szymczyk']
+                 'Bocephus', 'Diengklurg', 'Antwaun', 'Dart', 'Joe', 'Szymczyk', 'Stratton', 'Go', 'Bears']
         if random.uniform(0, 1) > 0.5:
             return random.choice(names)
         else:

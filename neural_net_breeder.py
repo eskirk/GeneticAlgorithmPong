@@ -62,6 +62,10 @@ class NeuralNetBreeder(object):
             # if the generation is sustainable/fit, start training each other
             if self.generation >= 3:
                 self.train_each_other = True
+            # if it is the 3rd generation and nobody has scored, create a new generation
+            elif self.generation >= 3 and self.best[0].score == 0:
+                self.train_each_other = False
+                self.population = []
 
             # play the games and evolve if any of the genomes are successful
             if not self.train_each_other:
@@ -80,13 +84,13 @@ class NeuralNetBreeder(object):
                     print(genome)
                 best[0].save_genome()
                 self.strict_breeding = True
-                self.best = list(self.best)
+                self.best = list(best)
             if best is None:
                 self.train_each_other = False
 
         # if we reach our desired generation, save the genomes in the ./final_genomes folder
         if self.generation >= self.max_generation:
-            print('=== Simulation over ===\nResults:')
+            print('=== Simulation over ===\n\nResults:')
             for p in self.best:
                 print(p)
                 p.save_genome('./final_genomes/')
@@ -218,12 +222,18 @@ class NeuralNetBreeder(object):
     def get_fit_individuals(self):
         fit_individuals = []
         for p in self.population:
-            if self.strict_breeding and p.fitness > 1:
-                fit_individuals.append(p)
-            else:
-                p.fitness += p.contacts_ball
-                if p.fitness > 1:
+            if not self.train_each_other:
+                if self.strict_breeding and p.fitness > 1 and (p.fitness > p.contacts_ball):
+                    print(p)
                     fit_individuals.append(p)
+                else:
+                    p.fitness += p.contacts_ball
+                    if p.fitness > 1:
+                        fit_individuals.append(p)
+            elif self.train_each_other:
+                if p.score == 3 and (p.contacts_ball > p.score):
+                    fit_individuals.append(p)
+
         return fit_individuals
 
     def breed(self):
@@ -239,7 +249,7 @@ class NeuralNetBreeder(object):
         if len(fit_individuals) == 1:
             while len(self.population) < self.population_size:
                 self.population.append(self.crossover(fittest))
-        else:
+        elif len(fit_individuals) > 1:
             second_fittest = fit_individuals[1]
             if not self.strict_breeding:
                 fittest = self.crossover(fittest, second_fittest)
