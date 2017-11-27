@@ -10,6 +10,7 @@ class NeuralNetBreeder(object):
         self.population = []
         self.games = []
         self.generation = 0
+        self.mutation_rate = 0.05
         self.max_generation = max_generation
         self.best = []
         self.population_size = population_size
@@ -43,27 +44,34 @@ class NeuralNetBreeder(object):
             self.population = sorted(population, key=lambda x: x.fitness, reverse=True)
         # if there is a parent, create a generation based off the parent's genes
         elif parent is not None:
-            population = [parent]
-            self.generation = parent.generation
+            population = parent
+            if len(population) > 1:
+                self.generation = population[0].generation
+            else:
+                self.generation = parent.generation
 
-            game = PongGame()
-            parent.game = game
-            parent.ball = game.ball
-            game.paddle1 = parent
+            for p in population:
+                game = PongGame()
+                p.game = game
+                p.ball = game.ball
+                game.paddle1 = p
+                self.games.append(game)
 
-            self.games = [game]
             for i in range(self.population_size - 1):
-                population.append(self.crossover(parent))
+                if len(parent) > 1:
+                    population.append(self.crossover(random.choice(parent), random.choice(parent)))
+                else:
+                    population.append(self.crossover(parent))
             self.population = population
 
     def start_breeding(self):
         # begin creating generations while the generation count is under the desired limit
         while self.generation <= self.max_generation:
             # if the generation is sustainable/fit, start training each other
-            if self.generation >= 3:
+            if self.generation >= 3 and len(self.best) > 0 and self.best[0].score > 0:
                 self.train_each_other = True
             # if it is the 3rd generation and nobody has scored, create a new generation
-            elif self.generation >= 3 and self.best[0].score == 0:
+            elif self.generation >= 3 and len(self.best) > 0 and self.best[0].score == 0:
                 self.train_each_other = False
                 self.population = []
 
@@ -150,10 +158,14 @@ class NeuralNetBreeder(object):
         # perform crossover for each layer and synapse
         for layer in range(len(offspring.net.synapses)):
             for synapse in range(len(offspring.net.synapses[layer])):
-                if random.uniform(0, 1) > (1/3):
-                    offspring.net.synapses[layer][synapse].weight = parent1.net.synapses[layer][synapse].weight
+                # if the laws of nature say it must be so, mutate the current synapse
+                if random.uniform(0, 1) < self.mutation_rate:
+                    offspring.net.synapses[layer][synapse].weight = self.mutate(offspring.net.synapses[layer][synapse].weight)
                 else:
-                    offspring.net.synapses[layer][synapse].weight = mate.net.synapses[layer][synapse].weight
+                    if random.uniform(0, 1) > (1/3):
+                        offspring.net.synapses[layer][synapse].weight = parent1.net.synapses[layer][synapse].weight
+                    else:
+                        offspring.net.synapses[layer][synapse].weight = mate.net.synapses[layer][synapse].weight
             # crossover the parent's colors as well
             offspring.colors = [parent1.colors[0], mate.colors[1], parent1.colors[2], mate.colors[3]]
         f_name = random.choice(parent1.name.split())
@@ -162,8 +174,12 @@ class NeuralNetBreeder(object):
 
         return offspring
 
-    def mutate(self):
-        pass
+    @staticmethod
+    def mutate(synapse):
+        if synapse > 0:
+            return random.uniform(0, 1)
+        elif synapse <= 0:
+            return random.uniform(-1, 0)
 
     def play_against_boring_ai(self):
         # if nobody survived the last generation, generate a new population
@@ -223,8 +239,7 @@ class NeuralNetBreeder(object):
         fit_individuals = []
         for p in self.population:
             if not self.train_each_other:
-                if self.strict_breeding and p.fitness > 1 and (p.fitness > p.contacts_ball):
-                    print(p)
+                if self.strict_breeding and p.fitness > 1 and (p.contacts_ball > p.score):
                     fit_individuals.append(p)
                 else:
                     p.fitness += p.contacts_ball
@@ -281,9 +296,17 @@ def main(args):
     breeder = NeuralNetBreeder(args.p, args.strict, args.g)
     print(breeder)
     if args.load is not None:
-        parent = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
-        parent.load_genomes(args.load)
-        breeder.strict_breeding = True
+        if args.load[0] == '[':
+            parent = []
+            genomes = args.load.split(',')
+            for g in genomes:
+                genome = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
+                genome.load_genomes(g.strip(' [] '))
+                parent.append(genome)
+        else:
+            parent = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
+            parent.load_genomes(args.load)
+            breeder.strict_breeding = True
 
     breeder.init_breeder(parent)
     breeder.start_breeding()

@@ -166,9 +166,12 @@ class NNPaddle(object):
     def follow_ball(self, delta):
         y_pos = self.bounds.y + self.bounds.height
         ball_y = self.ball.bounds.y
+        ball_x = self.ball.bounds.x
         ball_speed = math.sqrt(self.ball.vel_x**2 + self.ball.vel_y**2)
+
         inputs = [y_pos, ball_y, ball_speed]
         # inputs = [y_pos, ball_y, self.ball.vel_x, self.ball.vel_y]
+        # inputs = [y_pos, ball_x, ball_y, ball_speed]
 
         output = self.net.get_output(inputs)
         if output > 0.5:
@@ -193,7 +196,13 @@ class NNPaddle(object):
         f.close()
 
     def load_genomes(self, file):
-        f = open('./genomes/' + file)
+        try:
+            f = open('./genomes/' + file)
+        except FileNotFoundError:
+            try:
+                f = open('./final_genomes/' + file)
+            except FileNotFoundError:
+                print('File not found')
         layer_number = 0
         synapses = []
         name, gen = False, False
