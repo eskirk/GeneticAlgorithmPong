@@ -45,7 +45,7 @@ class NeuralNetBreeder(object):
         # if there is a parent, create a generation based off the parent's genes
         elif parent is not None:
             population = parent
-            if len(population) > 1:
+            if type(population) is list:
                 self.generation = population[0].generation
             else:
                 self.generation = parent.generation
@@ -63,26 +63,29 @@ class NeuralNetBreeder(object):
                 else:
                     population.append(self.crossover(parent))
             self.population = population
+            self.generation = self.population[0].generation
 
     def start_breeding(self):
         # begin creating generations while the generation count is under the desired limit
         while self.generation <= self.max_generation:
-            # if the generation is sustainable/fit, start training each other
-            if self.generation >= 3 and len(self.best) > 0 and self.best[0].score > 0:
-                self.train_each_other = True
-            # if it is the 3rd generation and nobody has scored, create a new generation
-            elif self.generation >= 3 and len(self.best) > 0 and self.best[0].score == 0:
-                self.train_each_other = False
-                self.population = []
+            if self.generation >= 3 and len(self.best) > 0:
+                # if the generation is sustainable/fit, start training each other
+                if self.best[0].score > 0:
+                    self.train_each_other = True
+                # if it is the 3rd generation and nobody has scored, create a new generation
+                elif self.best[0].score == 0:
+                    self.train_each_other = False
+                    self.population = []
 
             # play the games and evolve if any of the genomes are successful
             if not self.train_each_other:
                 self.play_against_boring_ai()
-                best = self.breed()
             # if these genomes are already developed, play against each other
             else:
                 self.play_games_against_each_other()
-                best = self.breed()
+
+            # breed the population together after playing games
+            best = self.breed()
 
             # if there was a fit genome, save their genome and build a generation off of them
             if best is not None:
@@ -93,8 +96,9 @@ class NeuralNetBreeder(object):
                 best[0].save_genome()
                 self.strict_breeding = True
                 self.best = list(best)
+            # if there are no fit genomes, create a new population
             if best is None:
-                self.train_each_other = False
+                self.create_new_population()
 
         # if we reach our desired generation, save the genomes in the ./final_genomes folder
         if self.generation >= self.max_generation:
@@ -237,9 +241,10 @@ class NeuralNetBreeder(object):
 
     def get_fit_individuals(self):
         fit_individuals = []
+        print(self.population)
         for p in self.population:
             if not self.train_each_other:
-                if self.strict_breeding and p.fitness > 1 and (p.contacts_ball > p.score):
+                if self.strict_breeding and p.fitness > 1 and (p.contacts_ball >= p.score):
                     fit_individuals.append(p)
                 else:
                     p.fitness += p.contacts_ball
@@ -249,6 +254,7 @@ class NeuralNetBreeder(object):
                 if p.score == 3 and (p.contacts_ball > p.score):
                     fit_individuals.append(p)
 
+        print(fit_individuals)
         return fit_individuals
 
     def breed(self):
@@ -260,10 +266,13 @@ class NeuralNetBreeder(object):
         if len(fit_individuals) >= 1:
             fit_individuals = sorted(fit_individuals, key=lambda x: x.fitness, reverse=True)
             fittest = fit_individuals[0]
+        else:
+            return None
 
         if len(fit_individuals) == 1:
             while len(self.population) < self.population_size:
                 self.population.append(self.crossover(fittest))
+            return fit_individuals
         elif len(fit_individuals) > 1:
             second_fittest = fit_individuals[1]
             if not self.strict_breeding:
@@ -297,12 +306,7 @@ def main(args):
     print(breeder)
     if args.load is not None:
         if args.load[0] == '[':
-            parent = []
-            genomes = args.load.split(',')
-            for g in genomes:
-                genome = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
-                genome.load_genomes(g.strip(' [] '))
-                parent.append(genome)
+            parent = load_parents(args.load)
         else:
             parent = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
             parent.load_genomes(args.load)
@@ -310,6 +314,16 @@ def main(args):
 
     breeder.init_breeder(parent)
     breeder.start_breeding()
+
+
+def load_parents(load):
+    parents = []
+    genomes = load.split(',')
+    for g in genomes:
+        genome = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, None, None)
+        genome.load_genomes(g.strip(' [] '))
+        parents.append(genome)
+    return parents
 
 
 def parse_args():

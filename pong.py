@@ -63,8 +63,11 @@ class PongGame:
         font = pygame.font.Font(None, 25)
         score = font.render(self.paddle2.name + ' | ' + str(self.scores[1]) + ' - ' + str(self.scores[0]) + ' | ' +
                             self.paddle1.name, True, (0, 0, 0))
+        info = font.render('Generation ' + str(self.paddle1.generation), True, (0, 0, 0))
         rect = score.get_rect(center=(325, 60))
+        info_rect = info.get_rect(center=(325, 90))
         display.blit(score, rect)
+        display.blit(info, info_rect)
 
     def handle_input(self, delta):
         # listen for key presses

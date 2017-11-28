@@ -197,10 +197,10 @@ class NNPaddle(object):
 
     def load_genomes(self, file):
         try:
-            f = open('./genomes/' + file)
+            f = open('./final_genomes/' + file)
         except FileNotFoundError:
             try:
-                f = open('./final_genomes/' + file)
+                f = open('./genomes/' + file)
             except FileNotFoundError:
                 print('File not found')
         layer_number = 0
