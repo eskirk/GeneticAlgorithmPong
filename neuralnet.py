@@ -250,6 +250,37 @@ class NNPaddle(object):
             return f_name + ' ' + l_name
 
 
+class SidewaysNNPaddle(NNPaddle):
+
+    def __init__(self, x_pos, y_pos, ball, game):
+        NNPaddle.__init__(self, x_pos, y_pos, ball, game)
+        self.bounds = pygame.Rect(x_pos, y_pos, 100, 15)
+
+    def follow_ball(self, delta):
+        y_pos = self.bounds.y + self.bounds.height
+        ball_y = self.ball.bounds.y
+        ball_x = self.ball.bounds.x
+        ball_speed = math.sqrt(self.ball.vel_x**2 + self.ball.vel_y**2)
+
+        inputs = [y_pos, ball_y, ball_speed]
+        # inputs = [y_pos, ball_y, self.ball.vel_x, self.ball.vel_y]
+        # inputs = [y_pos, ball_x, ball_y, ball_speed]
+
+        output = self.net.get_output(inputs)
+        if output > 0.5:
+            if self.bounds.x + self.bounds.width < self.game.window_width:
+                self.move_right(delta)
+        else:
+            if self.bounds.x > 0:
+                self.move_left(delta)
+
+    def move_right(self, delta):
+        self.bounds = self.bounds.move(-250 * delta, 0)
+
+    def move_left(self, delta):
+        self.bounds = self.bounds.move(250 * delta, 0)
+
+
 if __name__ == '__main__':
     net = NeuralNet(3, 1, 3)
     inps = [0, 0, 0]

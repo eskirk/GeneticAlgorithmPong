@@ -6,7 +6,7 @@ import argparse
 
 
 class NeuralNetBreeder(object):
-    def __init__(self, population_size=10, strict_breeding=False, max_generation=5):
+    def __init__(self, population_size=10, strict_breeding=False, max_generation=5, arena=False):
         self.population = []
         self.games = []
         self.generation = 0
@@ -17,12 +17,16 @@ class NeuralNetBreeder(object):
         self.cur_speed = 1000
         self.strict_breeding = strict_breeding
         self.train_each_other = False
+        self.arena = arena
 
     def __str__(self):
         return '\n=== Neural Net Breeder ===\nPopulation Size: ' + str(self.population_size) + '\nStrict Breeding: ' + \
                str(self.strict_breeding)
 
     def init_breeder(self, parent=None):
+        # if the bell of the arena chimes, we must answer
+        if self.arena:
+            self.arena_battle(parent)
         # if there is no parent, create a new randomly generated population
         if parent is None:
             self.create_new_population()
@@ -50,6 +54,7 @@ class NeuralNetBreeder(object):
             else:
                 self.generation = parent.generation
 
+            # go through the population and assign paddles to games, balls to paddles, etc
             for p in population:
                 game = PongGame()
                 p.game = game
@@ -107,6 +112,21 @@ class NeuralNetBreeder(object):
                 print(p)
                 p.save_genome('./final_genomes/')
 
+    @staticmethod
+    def arena_battle(parent):
+        if parent is None:
+            # create new population to battle in the arena
+            game = PongGame(True)
+            game.start_game()
+        else:
+            if type(parent) is list and len(parent) == 4:
+                # use these parents to start an arena battle
+                game = PongGame(True)
+                game.start_game()
+            else:
+                # use this parent to start a new generation for an arena battle
+                pass
+
     def create_new_population(self):
         print('\nCreating new population of size', self.population_size)
         self.generation = 0
@@ -127,16 +147,6 @@ class NeuralNetBreeder(object):
             self.games.append(game)
 
         self.population = population
-
-    # set current genome fit, if all genomes have been set,
-    # create a new generation
-    def new_genome(self, current_fit):
-        pass
-
-    # create a new generation, if the generation has already been initialized,
-    # crossover to create a new generation
-    def new_generation(self):
-        pass
 
     # sort the genomes and cross them over with all other genomes
     def crossover(self, parent1, parent2=None):
@@ -258,43 +268,40 @@ class NeuralNetBreeder(object):
         return fit_individuals
 
     def breed(self):
+        # find the fit individuals in the population
         fit_individuals = self.get_fit_individuals()
+        # reset the population and games
         self.population = []
         self.games = []
 
         # if there are fit individuals, use them to create a new population
         if len(fit_individuals) >= 1:
             fit_individuals = sorted(fit_individuals, key=lambda x: x.fitness, reverse=True)
+            # if not strict breeding, split the fit individuals in half and keep the better half
+            if not self.strict_breeding:
+                fit_individuals = fit_individuals[:(len(fit_individuals) / 2)]
             fittest = fit_individuals[0]
+        # if there are no fit individuals, restart
         else:
             return None
 
+        # if there is only one fit individual, create a new population with only that one
         if len(fit_individuals) == 1:
             while len(self.population) < self.population_size:
                 self.population.append(self.crossover(fittest))
             return fit_individuals
+        # if there is more than one fit individual, breed them together to create the next population
         elif len(fit_individuals) > 1:
             second_fittest = fit_individuals[1]
-            if not self.strict_breeding:
-                fittest = self.crossover(fittest, second_fittest)
-                while len(self.population) < self.population_size:
-                    self.population.append(self.crossover(fittest))
-            else:
+            self.population.append(self.crossover(fittest, second_fittest))
+
+            while len(self.population) < self.population_size:
+                temp_population = list(fit_individuals)
+                fittest = random.choice(temp_population)
+                temp_population.remove(fittest)
+                second_fittest = random.choice(temp_population)
                 self.population.append(self.crossover(fittest, second_fittest))
-                while len(self.population) < self.population_size:
-                    temp_population = list(fit_individuals)
-                    fittest = random.choice(temp_population)
-                    temp_population.remove(fittest)
-                    second_fittest = random.choice(temp_population)
-                    self.population.append(self.crossover(fittest, second_fittest))
 
-                    while len(self.population) < self.population_size:
-                        temp_population = list(fit_individuals)
-                        fittest = random.choice(temp_population)
-                        temp_population.remove(fittest)
-                        second_fittest = random.choice(temp_population)
-
-                        self.population.append(self.crossover(fittest, second_fittest))
             return fit_individuals
         # if there are no fit individuals, return nothing
         return None
@@ -302,7 +309,7 @@ class NeuralNetBreeder(object):
 
 def main(args):
     parent = None
-    breeder = NeuralNetBreeder(args.p, args.strict, args.g)
+    breeder = NeuralNetBreeder(args.p, args.strict, args.g, args.arena)
     print(breeder)
     if args.load is not None:
         if args.load[0] == '[':
@@ -332,6 +339,7 @@ def parse_args():
     parser.add_argument('-p', type=int, default=10)
     parser.add_argument('-load', type=str, default=None)
     parser.add_argument('-strict', type=bool, default=False)
+    parser.add_argument('-arena', type=bool, default=False)
     args = parser.parse_args()
 
     if args.g <= 0:
@@ -347,6 +355,9 @@ def parse_args():
 
     if args.strict is not False and not isinstance(args.strict, bool):
         raise argparse.ArgumentTypeError("Must provide a boolean for strict breeding")
+
+    if args.arena is not False and not isinstance(args.arena, bool):
+        raise argparse.ArgumentTypeError("Must provide a boolean for arena")
 
     return args
 

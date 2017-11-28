@@ -3,6 +3,7 @@ import pygame
 from ball import Ball
 from neuralnet import AIPaddle
 from neuralnet import NNPaddle
+from neuralnet import SidewaysNNPaddle
 from paddle import Paddle
 
 
@@ -10,10 +11,11 @@ class PongGame:
     window_width = 650
     window_height = 500
 
-    def __init__(self):
+    def __init__(self, four_player=False):
         self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
         self.paddle1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, self.ball, self)
         self.paddle2 = AIPaddle(50, PongGame.window_height / 2, self.ball, self)
+        self.paddles = [self.paddle1, self.paddle2]
         self.temp_paddle = None
 
         self.winner = None
@@ -22,6 +24,16 @@ class PongGame:
         self.scores = [0, 0]
         self.timeout = 0
         self.pause = False
+
+        if four_player:
+            arena_width = 750
+            arena_height = 750
+
+            self.paddle1 = NNPaddle(arena_width - 50, arena_height / 2, self.ball, self)
+            self.paddle2 = NNPaddle(50, arena_height / 2, self.ball, self)
+            self.paddle3 = SidewaysNNPaddle(arena_width / 2, arena_height - 50, self.ball, self)
+            self.paddle4 = SidewaysNNPaddle(arena_width / 2, 50, self.ball, self)
+            self.paddles = [self.paddle1, self.paddle2, self.paddle3, self.paddle4]
 
     def start_game(self):
         pygame.init()
@@ -57,8 +69,8 @@ class PongGame:
             pygame.display.flip()
 
     def draw(self, display):
-        self.paddle1.draw(display)
-        self.paddle2.draw(display)
+        for paddle in self.paddles:
+            paddle.draw(display)
         self.ball.draw(display)
         font = pygame.font.Font(None, 25)
         score = font.render(self.paddle2.name + ' | ' + str(self.scores[1]) + ' - ' + str(self.scores[0]) + ' | ' +
