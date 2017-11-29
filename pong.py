@@ -15,8 +15,12 @@ class PongGame:
         self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
         self.paddle1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, self.ball, self)
         self.paddle2 = AIPaddle(50, PongGame.window_height / 2, self.ball, self)
+        self.paddle3 = None
+        self.paddle4 = None
+
         self.paddles = [self.paddle1, self.paddle2]
         self.temp_paddle = None
+        self.four_player = four_player
 
         self.winner = None
         self.game_over = False
@@ -25,9 +29,9 @@ class PongGame:
         self.timeout = 0
         self.pause = False
 
-        if four_player:
-            arena_width = 750
-            arena_height = 750
+        if self.four_player:
+            arena_width = 650
+            arena_height = 500
 
             self.paddle1 = NNPaddle(arena_width - 50, arena_height / 2, self.ball, self)
             self.paddle2 = NNPaddle(50, arena_height / 2, self.ball, self)
@@ -40,10 +44,10 @@ class PongGame:
 
         clock = pygame.time.Clock()
         display = pygame.display.set_mode((PongGame.window_width, PongGame.window_height))
+
         pygame.display.set_caption('Neural Net Pong')
 
         while not self.game_over:
-
             delta = clock.tick(60) / self.speed
             display.fill((255, 255, 255))
 
@@ -57,8 +61,8 @@ class PongGame:
             if not self.game_over:
                 self.handle_collisions()
             # super super advanced AI
-            self.paddle1.follow_ball(delta)
-            self.paddle2.follow_ball(delta)
+            for paddle in self.paddles:
+                paddle.follow_ball(delta)
             self.ball.move(delta)
 
             self.draw(display)
@@ -71,6 +75,7 @@ class PongGame:
     def draw(self, display):
         for paddle in self.paddles:
             paddle.draw(display)
+
         self.ball.draw(display)
         font = pygame.font.Font(None, 25)
         score = font.render(self.paddle2.name + ' | ' + str(self.scores[1]) + ' - ' + str(self.scores[0]) + ' | ' +
@@ -109,7 +114,7 @@ class PongGame:
                 self.pause = False
 
     def handle_collisions(self):
-        # collision with human paddle
+        # collision with paddle
         if self.ball.intersects_paddle(self.paddle2, self.paddle1):
             self.ball.vel_x = -self.ball.vel_x
             self.ball.vel_x *= 1.05

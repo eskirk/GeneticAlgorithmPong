@@ -49,10 +49,6 @@ class NeuralNetBreeder(object):
         # if there is a parent, create a generation based off the parent's genes
         elif parent is not None:
             population = parent
-            if type(population) is list:
-                self.generation = population[0].generation
-            else:
-                self.generation = parent.generation
 
             # go through the population and assign paddles to games, balls to paddles, etc
             for p in population:
@@ -67,6 +63,7 @@ class NeuralNetBreeder(object):
                     population.append(self.crossover(random.choice(parent), random.choice(parent)))
                 else:
                     population.append(self.crossover(parent))
+
             self.population = population
             self.generation = self.population[0].generation
 
@@ -95,7 +92,7 @@ class NeuralNetBreeder(object):
             # if there was a fit genome, save their genome and build a generation off of them
             if best is not None:
                 print('\nDaddies of generation', self.generation, ':')
-                self.generation += 1
+
                 for genome in best:
                     print(genome)
                 best[0].save_genome()
@@ -264,7 +261,6 @@ class NeuralNetBreeder(object):
                 if p.score == 3 and (p.contacts_ball > p.score):
                     fit_individuals.append(p)
 
-        print(fit_individuals)
         return fit_individuals
 
     def breed(self):
@@ -281,6 +277,8 @@ class NeuralNetBreeder(object):
             if not self.strict_breeding:
                 fit_individuals = fit_individuals[:(len(fit_individuals) / 2)]
             fittest = fit_individuals[0]
+
+            self.generation += 1
         # if there are no fit individuals, restart
         else:
             return None

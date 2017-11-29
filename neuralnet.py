@@ -28,8 +28,7 @@ class NeuralNet(object):
             for curr_ndx in range(len(self.hidden_layers) - 1):
                 for neuron in self.hidden_layers[curr_ndx]:
                     for next_neuron in self.hidden_layers[curr_ndx + 1]:
-                        self.synapses[curr_ndx +
-                                      1].append(Synapse(neuron, next_neuron))
+                        self.synapses[curr_ndx + 1].append(Synapse(neuron, next_neuron))
 
         # link last layer to output
         for neuron in self.hidden_layers[len(self.hidden_layers) - 1]:
@@ -269,10 +268,10 @@ class SidewaysNNPaddle(NNPaddle):
         output = self.net.get_output(inputs)
         if output > 0.5:
             if self.bounds.x + self.bounds.width < self.game.window_width:
-                self.move_right(delta)
+                self.move_left(delta)
         else:
             if self.bounds.x > 0:
-                self.move_left(delta)
+                self.move_right(delta)
 
     def move_right(self, delta):
         self.bounds = self.bounds.move(-250 * delta, 0)
