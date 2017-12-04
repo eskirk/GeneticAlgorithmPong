@@ -275,7 +275,7 @@ class NeuralNetBreeder(object):
             fit_individuals = sorted(fit_individuals, key=lambda x: x.fitness, reverse=True)
             # if not strict breeding, split the fit individuals in half and keep the better half
             if not self.strict_breeding:
-                fit_individuals = fit_individuals[:(len(fit_individuals) / 2)]
+                fit_individuals = fit_individuals[:(int(len(fit_individuals) / 2))]
             fittest = fit_individuals[0]
 
             self.generation += 1

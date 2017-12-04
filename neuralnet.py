@@ -106,10 +106,11 @@ class AIPaddle(object):
 
 
 class NNPaddle(object):
-    def __init__(self, x_pos, y_pos, ball, game):
+    def __init__(self, x_pos, y_pos, ball, game, four_player=False):
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
         self.ball = ball
         self.game = game
+        self.four_player = four_player
         # self.net = NeuralNet(4, 1, 3)
         self.net = NeuralNet(3, 1, 3)
         self.generation = 0
@@ -173,12 +174,20 @@ class NNPaddle(object):
         # inputs = [y_pos, ball_x, ball_y, ball_speed]
 
         output = self.net.get_output(inputs)
-        if output > 0.5:
-            if self.bounds.y + self.bounds.height < self.game.window_height:
-                self.move_down(delta)
+        if not self.four_player:
+            if output > 0.5:
+                if self.bounds.y + self.bounds.height < self.game.window_height:
+                    self.move_down(delta)
+            else:
+                if self.bounds.y > 0:
+                    self.move_up(delta)
         else:
-            if self.bounds.y > 0:
-                self.move_up(delta)
+            if output > 0.5:
+                if self.bounds.y + self.bounds.height < self.game.window_height - 50:
+                    self.move_down(delta)
+            else:
+                if self.bounds.y > 50:
+                    self.move_up(delta)
 
     def reset(self, x_pos, y_pos, ball):
         self.ball = ball
@@ -250,7 +259,6 @@ class NNPaddle(object):
 
 
 class SidewaysNNPaddle(NNPaddle):
-
     def __init__(self, x_pos, y_pos, ball, game):
         NNPaddle.__init__(self, x_pos, y_pos, ball, game)
         self.bounds = pygame.Rect(x_pos, y_pos, 100, 15)
@@ -267,10 +275,10 @@ class SidewaysNNPaddle(NNPaddle):
 
         output = self.net.get_output(inputs)
         if output > 0.5:
-            if self.bounds.x + self.bounds.width < self.game.window_width:
+            if self.bounds.x + self.bounds.width < self.game.window_width - 50:
                 self.move_left(delta)
         else:
-            if self.bounds.x > 0:
+            if self.bounds.x > 50:
                 self.move_right(delta)
 
     def move_right(self, delta):
@@ -278,6 +286,10 @@ class SidewaysNNPaddle(NNPaddle):
 
     def move_left(self, delta):
         self.bounds = self.bounds.move(250 * delta, 0)
+
+    def reset(self, x_pos, y_pos, ball):
+        self.ball = ball
+        self.bounds = pygame.Rect(x_pos, y_pos, 100, 15)
 
 
 if __name__ == '__main__':
