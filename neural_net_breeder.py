@@ -119,6 +119,10 @@ class NeuralNetBreeder(object):
             if type(parent) is list and len(parent) == 4:
                 # use these parents to start an arena battle
                 game = PongGame(True)
+                game.paddle1.load_genomes(parent[0].name)
+                game.paddle2.load_genomes(parent[1].name)
+                game.paddle3.load_genomes(parent[2].name)
+                game.paddle4.load_genomes(parent[3].name)
                 game.start_game()
             else:
                 # use this parent to start a new generation for an arena battle
@@ -155,7 +159,7 @@ class NeuralNetBreeder(object):
         game.paddle1 = offspring
         self.games.append(game)
 
-        # if no other parent, breed with some rando
+        # if no other parent, breed with some random
         if parent2 is None:
             mate = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, offspring.game.ball, offspring.game)
             offspring.parents = [parent1, mate]

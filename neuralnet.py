@@ -264,12 +264,12 @@ class SidewaysNNPaddle(NNPaddle):
         self.bounds = pygame.Rect(x_pos, y_pos, 100, 15)
 
     def follow_ball(self, delta):
-        y_pos = self.bounds.y + self.bounds.height
+        x_pos = self.bounds.x + self.bounds.width
         ball_y = self.ball.bounds.y
         ball_x = self.ball.bounds.x
         ball_speed = math.sqrt(self.ball.vel_x**2 + self.ball.vel_y**2)
 
-        inputs = [y_pos, ball_y, ball_speed]
+        inputs = [x_pos, ball_x, ball_speed]
         # inputs = [y_pos, ball_y, self.ball.vel_x, self.ball.vel_y]
         # inputs = [y_pos, ball_x, ball_y, ball_speed]
 

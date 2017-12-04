@@ -3,11 +3,15 @@ import random
 
 
 class Ball:
-    def __init__(self, pos_x, pos_y):
+    def __init__(self, pos_x, pos_y, four_player=False):
         rect = pygame.Rect(pos_x, pos_y, 15, 15)
         self.bounds = rect
-        self.vel_x = random.choice([-150, 150])
-        self.vel_y = random.choice([-150, 150])
+        if not four_player:
+            self.vel_x = random.choice([-150, 150])
+            self.vel_y = random.choice([-150, 150])
+        else:
+            self.vel_x = random.choice([-150, -100, 100, 150])
+            self.vel_y = random.choice([-150, -100, 100, 150])
         self.last_hit = None
 
     def draw(self, display):

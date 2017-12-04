@@ -32,6 +32,7 @@ class PongGame:
             PongGame.window_width = 650
             PongGame.window_height = 650
 
+            self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2, True)
             self.scores = [0, 0, 0, 0]
             self.paddle1 = NNPaddle(PongGame.window_width - 50, PongGame.window_height / 2, self.ball, self, True)
             self.paddle2 = NNPaddle(50, PongGame.window_height / 2, self.ball, self, True)
@@ -162,7 +163,7 @@ class PongGame:
                 self.paddle2.fitness += 10
                 self.scores[1] += 1
 
-            self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
+            self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2, True)
             self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)
             self.paddle2.reset(50, PongGame.window_height / 2, self.ball)
             self.paddle3.reset(PongGame.window_width / 2, PongGame.window_height - 50, self.ball)
@@ -178,7 +179,7 @@ class PongGame:
                 self.paddle4.fitness += 10
                 self.scores[3] += 1
 
-            self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
+            self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2, True)
             self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)
             self.paddle2.reset(50, PongGame.window_height / 2, self.ball)
             self.paddle3.reset(PongGame.window_width / 2, PongGame.window_height - 50, self.ball)
