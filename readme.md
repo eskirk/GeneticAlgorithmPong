@@ -13,9 +13,12 @@ By Elliot Kirk and Colin Dutter
         * `default = 10`
     * `-load, string`: specifies a specific genome (located in the `/genomes` folder) to start a new generation from
         * `default = None`
+             * the user can provide a list of names to load multiple genomes at once (ex. `-load '[Name1, Name2, ...]'`)
     * `-strict, boolean`: specify whether or not you want strict breeding (use a fitness function based only on scoring 
     points, excluding the number of times the individual hits the ball)
         * `default = True` for the first generation, `False` for subsequent generations 
+    * `-arena, boolean`: enable the dreaded arena mode; a free-for-all four-paddle version of pong 
+        * `default = False`
     
  ## How the Genetic Algorithm Works
  This program uses a neural net in combination with a genetic algorithm to find the ultimate pong-playing AI.
