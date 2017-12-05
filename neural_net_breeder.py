@@ -115,8 +115,8 @@ class NeuralNetBreeder(object):
             # create new population to battle in the arena
             game = PongGame(True)
             game.start_game()
-        else:
-            if type(parent) is list and len(parent) == 4:
+        elif type(parent) is list:
+            if len(parent) == 4:
                 # use these parents to start an arena battle
                 game = PongGame(True)
                 game.paddle1.load_genomes(parent[0].name)
@@ -124,6 +124,9 @@ class NeuralNetBreeder(object):
                 game.paddle3.load_genomes(parent[2].name)
                 game.paddle4.load_genomes(parent[3].name)
                 game.start_game()
+        else:
+            
+
             else:
                 # use this parent to start a new generation for an arena battle
                 pass
