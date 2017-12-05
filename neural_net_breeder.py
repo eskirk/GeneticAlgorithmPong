@@ -25,9 +25,6 @@ class NeuralNetBreeder(object):
                str(self.strict_breeding)
 
     def init_breeder(self, parent=None):
-        # if the bell of the arena chimes, we must answer
-        if self.arena:
-            self.arena_battle(parent)
         # if there is no parent, create a new randomly generated population
         if parent is None:
             self.create_new_population()
@@ -326,8 +323,12 @@ def main(args):
             parent.load_genomes(args.load)
             breeder.strict_breeding = True
 
-    breeder.init_breeder(parent)
-    breeder.start_breeding()
+    # if the bell of the arena chimes, we must answer
+    if breeder.arena:
+        breeder.arena_battle(parent)
+    else:
+        breeder.init_breeder(parent)
+        breeder.start_breeding()
 
 
 def load_parents(load):

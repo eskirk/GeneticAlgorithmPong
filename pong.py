@@ -54,7 +54,9 @@ class PongGame:
                 if event.type == pygame.QUIT:
                     sys.exit()
 
+            # check for user input
             self.handle_input(delta)
+
             if not self.four_player:
                 self.game_over = self.handle_off_screen()
             else:
@@ -86,14 +88,27 @@ class PongGame:
             self.paddle4.draw(display)
 
         self.ball.draw(display)
+        self.draw_scoreboard(display)
+
+    def draw_scoreboard(self, display):
         font = pygame.font.Font(None, 25)
-        score = font.render(self.paddle2.name + ' | ' + str(self.scores[1]) + ' - ' + str(self.scores[0]) + ' | ' +
-                            self.paddle1.name, True, (0, 0, 0))
-        info = font.render('Generation ' + str(self.paddle1.generation), True, (0, 0, 0))
-        rect = score.get_rect(center=(325, 60))
-        info_rect = info.get_rect(center=(325, 90))
-        display.blit(score, rect)
-        display.blit(info, info_rect)
+        if not self.four_player:
+            score = font.render(self.paddle2.name + ' | ' + str(self.scores[1]) + ' - ' + str(self.scores[0]) + ' | ' +
+                                self.paddle1.name, True, (0, 0, 0))
+            info = font.render('Generation ' + str(self.paddle1.generation), True, (0, 0, 0))
+            rect = score.get_rect(center=(325, 60))
+            info_rect = info.get_rect(center=(325, 90))
+            display.blit(score, rect)
+            display.blit(info, info_rect)
+        else:
+            score1 = font.render(self.paddle2.name + ' | ' + str(self.scores[1]) + ' - ' + str(self.scores[0]) + ' | ' +
+                                 self.paddle1.name, True, (0, 0, 0))
+            score2 = font.render(self.paddle4.name + ' | ' + str(self.scores[3]) + ' - ' + str(self.scores[2]) + ' | ' +
+                                 self.paddle3.name, True, (0, 0, 0))
+            rect1 = score1.get_rect(center=(325, 300))
+            rect2 = score2.get_rect(center=(325, 350))
+            display.blit(score1, rect1)
+            display.blit(score2, rect2)
 
     def handle_input(self, delta):
         # listen for key presses
@@ -152,37 +167,31 @@ class PongGame:
             return True
 
         if self.ball.bounds.x + self.ball.bounds.width > PongGame.window_width or self.ball.bounds.x <= 0:
-            if self.ball.bounds.x <= 0:
-                self.paddle1.score += 1
-                self.paddle1.fitness += 10
-                self.scores[0] += 1
-            elif self.ball.bounds.x >= PongGame.window_width:
-                self.paddle2.score += 1
-                self.paddle2.fitness += 10
-                self.scores[1] += 1
-
-            self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
-            self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)
-            self.paddle2.reset(50, PongGame.window_height / 2, self.ball)
-            self.paddle3.reset(PongGame.window_width / 2, PongGame.window_height - 50, self.ball)
-            self.paddle4.reset(PongGame.window_width / 2, 50, self.ball)
-
+            self.point_scored()
         elif self.ball.bounds.y + self.ball.bounds.height > PongGame.window_height or self.ball.bounds.y <= 0:
-            if self.ball.bounds.y <= 0:
-                self.paddle3.score += 1
-                self.paddle3.fitness += 10
-                self.scores[2] += 1
-            elif self.ball.bounds.y >= PongGame.window_height:
-                self.paddle4.score += 1
-                self.paddle4.fitness += 10
-                self.scores[3] += 1
-
-            self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
-            self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)
-            self.paddle2.reset(50, PongGame.window_height / 2, self.ball)
-            self.paddle3.reset(PongGame.window_width / 2, PongGame.window_height - 50, self.ball)
-            self.paddle4.reset(PongGame.window_width / 2, 50, self.ball)
+            self.point_scored()
         return False
+
+    def point_scored(self):
+        if self.ball.last_hit is not None:
+            if self.ball.last_hit == self.paddle1:
+                self.scores[0] += 1
+                self.paddle1.score += 1
+            elif self.ball.last_hit == self.paddle2:
+                self.scores[1] += 1
+                self.paddle2.score += 1
+            elif self.ball.last_hit == self.paddle3:
+                self.scores[2] += 1
+                self.paddle2.score += 1
+            elif self.ball.last_hit == self.paddle4:
+                self.scores[3] += 1
+                self.paddle3.score += 1
+
+        self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
+        self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)
+        self.paddle2.reset(50, PongGame.window_height / 2, self.ball)
+        self.paddle3.reset(PongGame.window_width / 2, PongGame.window_height - 50, self.ball)
+        self.paddle4.reset(PongGame.window_width / 2, 50, self.ball)
 
     def handle_off_screen(self):
         if self.paddle1.score >= 3:
