@@ -6,7 +6,7 @@ from paddle import NNPaddle, SidewaysNNPaddle
 from pong import PongGame
 
 
-class NeuralNetBreeder(object):
+class Breeder(object):
     def __init__(self, population_size=10, strict_breeding=False, max_generation=5, arena=False):
         self.population = []
         self.games = []
@@ -97,7 +97,7 @@ class NeuralNetBreeder(object):
                 self.strict_breeding = True
                 self.best = list(best)
             # if there are no fit genomes, create a new population
-            if best is None:
+            elif best is None:
                 self.create_new_population()
 
         # if we reach our desired generation, save the genomes in the ./final_genomes folder
@@ -254,7 +254,6 @@ class NeuralNetBreeder(object):
 
     def get_fit_individuals(self):
         fit_individuals = []
-        print(self.population)
         for p in self.population:
             if not self.train_each_other:
                 if self.strict_breeding and p.fitness > 1 and (p.contacts_ball >= p.score):
@@ -313,7 +312,7 @@ class NeuralNetBreeder(object):
 
 def main(args):
     parent = None
-    breeder = NeuralNetBreeder(args.p, args.strict, args.g, args.arena)
+    breeder = Breeder(args.p, args.strict, args.g, args.arena)
     print(breeder)
     if args.load is not None:
         if args.load[0] == '[':
