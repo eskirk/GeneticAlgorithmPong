@@ -1,8 +1,9 @@
-from neuralnet import NeuralNet, AIPaddle, NNPaddle
-from pong import PongGame
 import copy
 import random
 import argparse
+
+from paddle import NNPaddle, SidewaysNNPaddle
+from pong import PongGame
 
 
 class NeuralNetBreeder(object):
@@ -111,25 +112,26 @@ class NeuralNetBreeder(object):
 
     @staticmethod
     def arena_battle(parent):
-        if parent is None:
-            # create new population to battle in the arena
-            game = PongGame(True)
-            game.start_game()
-        elif type(parent) is list:
+        game = PongGame(True)
+
+        if type(parent) is list:
             if len(parent) == 4:
                 # use these parents to start an arena battle
-                game = PongGame(True)
                 game.paddle1.load_genomes(parent[0].name)
                 game.paddle2.load_genomes(parent[1].name)
                 game.paddle3.load_genomes(parent[2].name)
                 game.paddle4.load_genomes(parent[3].name)
-                game.start_game()
-        else:
-            
-
             else:
-                # use this parent to start a new generation for an arena battle
-                pass
+                print('Must supply a list of four names OR a single name')
+                return
+        elif type(parent) is NNPaddle:
+            print(parent)
+            game.paddle1.load_genomes(parent.name)
+            game.paddle2.load_genomes(parent.name)
+            game.paddle3.load_genomes(parent.name)
+            game.paddle4.load_genomes(parent.name)
+
+        game.start_game()
 
     def create_new_population(self):
         print('\nCreating new population of size', self.population_size)

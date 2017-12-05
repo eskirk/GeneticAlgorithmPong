@@ -1,10 +1,8 @@
 import sys
 import pygame
+
 from ball import Ball
-from neuralnet import AIPaddle
-from neuralnet import NNPaddle
-from neuralnet import SidewaysNNPaddle
-from paddle import Paddle
+from paddle import Paddle, AIPaddle, NNPaddle, SidewaysNNPaddle
 
 
 class PongGame:
@@ -163,7 +161,7 @@ class PongGame:
                 self.paddle2.fitness += 10
                 self.scores[1] += 1
 
-            self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2, True)
+            self.ball = Ball(PongGame.window_width / 2, PongGame.window_height / 2)
             self.paddle1.reset(PongGame.window_width - 50, PongGame.window_height / 2, self.ball)
             self.paddle2.reset(50, PongGame.window_height / 2, self.ball)
             self.paddle3.reset(PongGame.window_width / 2, PongGame.window_height - 50, self.ball)
