@@ -1,11 +1,11 @@
 # Genetic Algorithm Plays Pong
-By Elliot Kirk and Colin Dutter
+By [Elliot Kirk](https://github.com/eskirk) and [Colin Dutter](https://github.com/collindutter)
 ## Prerequisites 
 - [Python3](https://www.python.org/downloads/)
 - [Pygame](http://www.pygame.org/download.shtml)
 
 ## How to Run the Neural Net Breeder
- * From the directory you cloned this repo into, run `python3 neural_net_breeder.py`
+ * From the directory you cloned this repo into, run `python3 breeder.py`
  * There are a couple of optional arguments you can include:
     * `-g, int`: specifies the number of generations to evolve over
         * `default = 5`
