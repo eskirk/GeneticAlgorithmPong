@@ -28,8 +28,7 @@ class NeuralNet(object):
             for curr_ndx in range(len(self.hidden_layers) - 1):
                 for neuron in self.hidden_layers[curr_ndx]:
                     for next_neuron in self.hidden_layers[curr_ndx + 1]:
-                        self.synapses[curr_ndx +
-                                      1].append(Synapse(neuron, next_neuron))
+                        self.synapses[curr_ndx + 1].append(Synapse(neuron, next_neuron))
 
         # link last layer to output
         for neuron in self.hidden_layers[len(self.hidden_layers) - 1]:
@@ -107,10 +106,11 @@ class AIPaddle(object):
 
 
 class NNPaddle(object):
-    def __init__(self, x_pos, y_pos, ball, game):
+    def __init__(self, x_pos, y_pos, ball, game, four_player=False):
         self.bounds = pygame.Rect(x_pos, y_pos, 15, 100)
         self.ball = ball
         self.game = game
+        self.four_player = four_player
         # self.net = NeuralNet(4, 1, 3)
         self.net = NeuralNet(3, 1, 3)
         self.generation = 0
@@ -174,12 +174,20 @@ class NNPaddle(object):
         # inputs = [y_pos, ball_x, ball_y, ball_speed]
 
         output = self.net.get_output(inputs)
-        if output > 0.5:
-            if self.bounds.y + self.bounds.height < self.game.window_height:
-                self.move_down(delta)
+        if not self.four_player:
+            if output > 0.5:
+                if self.bounds.y + self.bounds.height < self.game.window_height:
+                    self.move_down(delta)
+            else:
+                if self.bounds.y > 0:
+                    self.move_up(delta)
         else:
-            if self.bounds.y > 0:
-                self.move_up(delta)
+            if output > 0.5:
+                if self.bounds.y + self.bounds.height < self.game.window_height - 50:
+                    self.move_down(delta)
+            else:
+                if self.bounds.y > 50:
+                    self.move_up(delta)
 
     def reset(self, x_pos, y_pos, ball):
         self.ball = ball
@@ -239,7 +247,8 @@ class NNPaddle(object):
                  'Don Cheedle', 'Don', 'Cheedle', 'Stanley', 'Alexa', 'The Pacer Test', 'Finn', 'Daniel', 'Dan the Man',
                  'Dad', 'The Alamo', 'Grobgobbler', 'Gavin', 'Doyle', '@RealGavin', 'Juul', 'Bruul', 'Dr.', 'Bichael',
                  'Flats', 'Andrew', 'Farquaad', 'Blanch', 'Son of', 'Dreyfuss', 'Chad', 'Donald', 'Chump', 'Too Many',
-                 'Bocephus', 'Diengklurg', 'Antwaun', 'Dart', 'Joe', 'Szymczyk', 'Stratton', 'Go', 'Bears']
+                 'Bocephus', 'Diengklurg', 'Antwaun', 'Dart', 'Joe', 'Szymczyk', 'Stratton', 'Go', 'Bears',
+                 'Jabarbwire']
         if random.uniform(0, 1) > 0.5:
             return random.choice(names)
         else:
@@ -248,6 +257,40 @@ class NNPaddle(object):
             temp_names.remove(f_name)
             l_name = random.choice(temp_names)
             return f_name + ' ' + l_name
+
+
+class SidewaysNNPaddle(NNPaddle):
+    def __init__(self, x_pos, y_pos, ball, game):
+        NNPaddle.__init__(self, x_pos, y_pos, ball, game)
+        self.bounds = pygame.Rect(x_pos, y_pos, 100, 15)
+
+    def follow_ball(self, delta):
+        x_pos = self.bounds.x + self.bounds.width
+        ball_y = self.ball.bounds.y
+        ball_x = self.ball.bounds.x
+        ball_speed = math.sqrt(self.ball.vel_x**2 + self.ball.vel_y**2)
+
+        inputs = [x_pos, ball_x, ball_speed]
+        # inputs = [y_pos, ball_y, self.ball.vel_x, self.ball.vel_y]
+        # inputs = [y_pos, ball_x, ball_y, ball_speed]
+
+        output = self.net.get_output(inputs)
+        if output > 0.5:
+            if self.bounds.x + self.bounds.width < self.game.window_width - 50:
+                self.move_left(delta)
+        else:
+            if self.bounds.x > 50:
+                self.move_right(delta)
+
+    def move_right(self, delta):
+        self.bounds = self.bounds.move(-250 * delta, 0)
+
+    def move_left(self, delta):
+        self.bounds = self.bounds.move(250 * delta, 0)
+
+    def reset(self, x_pos, y_pos, ball):
+        self.ball = ball
+        self.bounds = pygame.Rect(x_pos, y_pos, 100, 15)
 
 
 if __name__ == '__main__':
