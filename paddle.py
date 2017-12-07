@@ -195,12 +195,12 @@ class NNPaddle(object):
 
     @staticmethod
     def random_name():
-        names = ['Cheenis', 'Garreth', 'Baxter', 'Slidey', 'McPong', 'Slidey McPong', 'Jeeves', 'Jacob', 'Bool',
-                 'Don Cheedle', 'Don', 'Cheedle', 'Stanley', 'Alexa', 'The Pacer Test', 'Finn', 'Daniel', 'Dan the Man',
-                 'Dad', 'The Alamo', 'Grobgobbler', 'Gavin', 'Doyle', '@RealGavin', 'Juul', 'Bruul', 'Dr.', 'Bichael',
-                 'Flats', 'Andrew', 'Farquaad', 'Blanch', 'Son of', 'Dreyfuss', 'Chad', 'Donald', 'Chump', 'Too Many',
-                 'Bocephus', 'Diengklurg', 'Antwaun', 'Dart', 'Joe', 'Szymczyk', 'Stratton', 'Go', 'Bears',
-                 'Jabarbwire']
+        names = ['Cheenis', 'Garreth', 'Baxter', 'Slidey', 'McPong', 'Jeeves', 'Jacob', 'Bool', 'Don', 'Cheedle', 'Don',
+                 'Cheedle', 'Stanley', 'Alexa', 'The Pacer Test', 'Finn', 'Daniel', 'Dan the Man', 'Dad', 'The Alamo',
+                 'Grobgobbler', 'Gavin', 'Doyle', '@RealGavin', 'Juul', 'Bruul', 'Dr.', 'Bichael', 'Flats', 'Andrew',
+                 'Farquaad', 'Blanch', 'Son of', 'Dreyfuss', 'Chad', 'Donald', 'Chump', 'Too Many', 'Bocephus',
+                 'Diengklurg', 'Antwaun', 'Dart', 'Joe', 'Szymczyk', 'Stratton', 'Go', 'Bears', 'Jabarbwire', 'Barbara',
+                 'Bush', 'Dante', 'Soldavini', 'Rick']
         if random.uniform(0, 1) > 0.5:
             return random.choice(names)
         else:
