@@ -46,8 +46,13 @@ class Breeder(object):
             self.population = sorted(population, key=lambda x: x.fitness, reverse=True)
         # if there is a parent, create a generation based off the parent's genes
         elif parent is not None:
-            population = parent
+            population = [parent]
+            if type(parent) is list:
+                self.generation = population[0].generation
+            else:
+                self.generation = parent.generation
 
+            print(population, len(population))
             # go through the population and assign paddles to games, balls to paddles, etc
             for p in population:
                 game = PongGame()
@@ -57,7 +62,7 @@ class Breeder(object):
                 self.games.append(game)
 
             for i in range(self.population_size - 1):
-                if len(parent) > 1:
+                if type(parent) is list and len(parent) > 1:
                     population.append(self.crossover(random.choice(parent), random.choice(parent)))
                 else:
                     population.append(self.crossover(parent))
