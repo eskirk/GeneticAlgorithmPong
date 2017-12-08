@@ -17,7 +17,7 @@ class Breeder(object):
         self.population_size = population_size
         self.cur_speed = 1000
         self.strict_breeding = strict_breeding
-        self.train_each_other = False
+        self.train_each_other = strict_breeding
         self.arena = arena
 
     def __str__(self):
@@ -46,7 +46,7 @@ class Breeder(object):
             self.population = sorted(population, key=lambda x: x.fitness, reverse=True)
         # if there is a parent, create a generation based off the parent's genes
         elif parent is not None:
-            population = [parent]
+            population = parent
             if type(parent) is list:
                 self.generation = population[0].generation
             else:
