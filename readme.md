@@ -1,5 +1,8 @@
 # Genetic Algorithm Plays Pong
 By [Elliot Kirk](https://github.com/eskirk) and [Colin Dutter](https://github.com/collindutter)
+
+[Genetic Algorithm in action](https://youtu.be/k8aI5_BM4b4)
+
 ## Prerequisites 
 - [Python3](https://www.python.org/downloads/)
 - [Pygame](http://www.pygame.org/download.shtml)
